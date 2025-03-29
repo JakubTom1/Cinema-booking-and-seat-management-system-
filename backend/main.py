@@ -1,21 +1,38 @@
-from fastapi import FastAPI
-from database import Base, engine
-from routes.users import router as users_router
-from routes.reservations import router as reservations_router
-from routes.movies import router as movies_router
+from fastapi import FastAPI, Depends
+from sqlalchemy.orm import Session
+from database import SessionLocal, init_db
+from models import Klient, Film, Seans, Sala, Miejsce, Transakcja
+from schemas import KlientCreate, FilmCreate, SeansCreate, SalaCreate, MiejsceCreate, TransakcjaCreate
 
-# Tworzenie tabel w bazie danych (jeśli nie istnieją)
-Base.metadata.create_all(bind=engine)
+# Inicjalizacja bazy danych
+init_db()
 
-# Inicjalizacja FastAPI
-app = FastAPI(title="System Rezerwacji Kinowej")
+app = FastAPI()
 
-# Rejestrowanie endpointów z poszczególnych modułów
-app.include_router(users_router, prefix="/users", tags=["Users"])
-app.include_router(reservations_router, prefix="/reservations", tags=["Reservations"])
-app.include_router(movies_router, prefix="/movies", tags=["Movies"])
+# Funkcja do pozyskiwania sesji
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
-# Endpoint testowy, by sprawdzić czy API działa
-@app.get("/")
-def read_root():
-    return {"message": "Witaj w systemie rezerwacji kinowej!"}
+# Endpointy API do obsługi różnych zasobów (np. Klientów, Filmów, Seansów)
+
+@app.post("/klienci/", response_model=Klient)
+def create_klient(klient: KlientCreate, db: Session = Depends(get_db)):
+    db_klient = Klient(imie=klient.imie, nazwisko=klient.nazwisko, login=klient.login, haslo=klient.haslo)
+    db.add(db_klient)
+    db.commit()
+    db.refresh(db_klient)
+    return db_klient
+
+@app.post("/filmy/", response_model=Film)
+def create_film(film: FilmCreate, db: Session = Depends(get_db)):
+    db_film = Film(tytul=film.tytul, grany_od=film.grany_od, grany_do=film.grany_do)
+    db.add(db_film)
+    db.commit()
+    db.refresh(db_film)
+    return db_film
+
+# Można dodać więcej endpointów dla Seansów, Sal, Miejsc i Transakcji

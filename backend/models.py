@@ -1,27 +1,73 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, Date, Time, ForeignKey, Boolean, Numeric
 from sqlalchemy.orm import relationship
 from database import Base
 
-class User(Base):
-    __tablename__ = "users"
+# Model Klientów
+class Klient(Base):
+    __tablename__ = 'klienci'
 
     id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, index=True)
-    password = Column(String)
+    imie = Column(String, index=True)
+    nazwisko = Column(String, index=True)
+    login = Column(String, unique=True, index=True)
+    haslo = Column(String)
 
-class Movie(Base):
-    __tablename__ = "movies"
+    transakcje = relationship("Transakcja", back_populates="klient")
 
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String)
-    duration = Column(Integer)  # Czas trwania w minutach
-
-class Reservation(Base):
-    __tablename__ = "reservations"
+# Model Filmów
+class Film(Base):
+    __tablename__ = 'filmy'
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    movie_id = Column(Integer, ForeignKey("movies.id"))
-    seat_number = Column(String)
+    tytul = Column(String, index=True)
+    grany_od = Column(Date)
+    grany_do = Column(Date)
 
+    seanse = relationship("Seans", back_populates="film")
 
+# Model Seansów
+class Seans(Base):
+    __tablename__ = 'seanse'
+
+    id = Column(Integer, primary_key=True, index=True)
+    id_film = Column(Integer, ForeignKey('filmy.id'))
+    data = Column(Date)
+    godzina = Column(Time)
+    id_sala = Column(Integer, ForeignKey('sale.id'))
+
+    film = relationship("Film", back_populates="seanse")
+    sala = relationship("Sala", back_populates="seanse")
+
+# Model Sal
+class Sala(Base):
+    __tablename__ = 'sale'
+
+    id = Column(Integer, primary_key=True, index=True)
+    liczba_miejsc = Column(Integer)
+    liczba_wolnych_miejsc = Column(Integer)
+
+    seanse = relationship("Seans", back_populates="sala")
+    miejsca = relationship("Miejsce", back_populates="sala")
+
+# Model Transakcji
+class Transakcja(Base):
+    __tablename__ = 'transakcje'
+
+    id = Column(Integer, primary_key=True, index=True)
+    id_klienta = Column(Integer, ForeignKey('klienci.id'))
+    kwota = Column(Numeric(10, 2))
+    status = Column(String)
+    data = Column(Date)
+
+    klient = relationship("Klient", back_populates="transakcje")
+
+# Model Miejsc
+class Miejsce(Base):
+    __tablename__ = 'miejsca'
+
+    id = Column(Integer, primary_key=True, index=True)
+    numer_miejsca = Column(Integer)
+    czy_wolne = Column(Boolean, default=True)
+    id_sali = Column(Integer, ForeignKey('sale.id'))
+
+    sala = relationship("Sala", back_populates="miejsca")
