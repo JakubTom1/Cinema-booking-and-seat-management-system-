@@ -4,7 +4,7 @@ from database import SessionLocal, init_db
 from models import Klient, Film, Seans, Sala, Miejsce, Transakcja
 from schemas import KlientCreate, FilmCreate, SeansCreate, SalaCreate, MiejsceCreate, TransakcjaCreate
 
-# Inicjalizacja bazy danych
+# Initialize database
 init_db()
 
 app = FastAPI()

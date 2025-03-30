@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, Date, Time, ForeignKey, Boolean,
 from sqlalchemy.orm import relationship
 from database import Base
 
-# Model Klientów
+# Model of Clients
 class Klient(Base):
     __tablename__ = 'klienci'
 
@@ -14,7 +14,7 @@ class Klient(Base):
 
     transakcje = relationship("Transakcja", back_populates="klient")
 
-# Model Filmów
+# Model of Movies
 class Film(Base):
     __tablename__ = 'filmy'
 
@@ -25,7 +25,7 @@ class Film(Base):
 
     seanse = relationship("Seans", back_populates="film")
 
-# Model Seansów
+# Model of Showing
 class Seans(Base):
     __tablename__ = 'seanse'
 
@@ -38,7 +38,7 @@ class Seans(Base):
     film = relationship("Film", back_populates="seanse")
     sala = relationship("Sala", back_populates="seanse")
 
-# Model Sal
+# Model of Screening room
 class Sala(Base):
     __tablename__ = 'sale'
 
@@ -49,7 +49,7 @@ class Sala(Base):
     seanse = relationship("Seans", back_populates="sala")
     miejsca = relationship("Miejsce", back_populates="sala")
 
-# Model Transakcji
+# Model of Transaction
 class Transakcja(Base):
     __tablename__ = 'transakcje'
 
@@ -61,7 +61,7 @@ class Transakcja(Base):
 
     klient = relationship("Klient", back_populates="transakcje")
 
-# Model Miejsc
+# Model of Places
 class Miejsce(Base):
     __tablename__ = 'miejsca'
 

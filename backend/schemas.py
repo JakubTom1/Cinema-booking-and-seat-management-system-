@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
 
-# Schema dla Klienta
+# Schema for clients
 class KlientCreate(BaseModel):
     imie: str
     nazwisko: str
@@ -16,7 +16,7 @@ class Klient(KlientCreate):
         orm_mode = True
 
 
-# Schema dla Filmu
+# Schema of movies
 class FilmCreate(BaseModel):
     tytul: str
     grany_od: datetime
@@ -29,7 +29,7 @@ class Film(FilmCreate):
         orm_mode = True
 
 
-# Schema dla Seansu
+# Schema of showing
 class SeansCreate(BaseModel):
     id_film: int
     data: datetime
@@ -43,7 +43,7 @@ class Seans(SeansCreate):
         orm_mode = True
 
 
-# Schema dla Sali
+# Schema of screening rooms
 class SalaCreate(BaseModel):
     liczba_miejsc: int
     liczba_wolnych_miejsc: int
@@ -55,7 +55,7 @@ class Sala(SalaCreate):
         orm_mode = True
 
 
-# Schema dla Miejsca
+# Schema of places
 class MiejsceCreate(BaseModel):
     numer_miejsca: int
     czy_wolne: bool
@@ -68,7 +68,7 @@ class Miejsce(MiejsceCreate):
         orm_mode = True
 
 
-# Schema dla Transakcji
+# Schema of transactions
 class TransakcjaCreate(BaseModel):
     id_klienta: int
     kwota: float
