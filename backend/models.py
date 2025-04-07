@@ -1,73 +1,97 @@
 from sqlalchemy import Column, Integer, String, Date, Time, ForeignKey, Boolean, Numeric
 from sqlalchemy.orm import relationship
-from database import Base
+#from database import Base, engine
+
+# kwestie technicze to będzie do usunięcia
+from sqlalchemy import create_engine, MetaData
+from sqlalchemy.orm import declarative_base
+
+# Connection to MySQL database
+url_address = "mysql+pymysql://szewcza1:rswiw3r376trLrTi@mysql.agh.edu.pl:3306/szewcza1"
+engine = create_engine(url_address)
+Base = declarative_base()
+metadata = MetaData()
+# dotąd
 
 # Model of Clients
-class Klient(Base):
-    __tablename__ = 'klienci'
+class User(Base):
+    __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, index=True)
-    imie = Column(String, index=True)
-    nazwisko = Column(String, index=True)
-    login = Column(String, unique=True, index=True)
-    haslo = Column(String)
+    first_name = Column(String(15), index=True)
+    last_name = Column(String(15), index=True)
+    status = Column(String(15), unique=True, index=True) # client, cinema staff or admin
+    login = Column(String(15), unique=True, index=True)
+    password = Column(String(15), unique=True, index=True)
 
-    transakcje = relationship("Transakcja", back_populates="klient")
+    transactions = relationship("Transaction", back_populates="user")
 
 # Model of Movies
-class Film(Base):
-    __tablename__ = 'filmy'
+class Movie(Base):
+    __tablename__ = 'movies'
 
     id = Column(Integer, primary_key=True, index=True)
-    tytul = Column(String, index=True)
-    grany_od = Column(Date)
-    grany_do = Column(Date)
+    tittle = Column(String(50), index=True)
 
-    seanse = relationship("Seans", back_populates="film")
+    showings = relationship("Showing", back_populates="movie")
 
 # Model of Showing
-class Seans(Base):
-    __tablename__ = 'seanse'
+class Showing(Base):
+    __tablename__ = 'showings'
 
     id = Column(Integer, primary_key=True, index=True)
-    id_film = Column(Integer, ForeignKey('filmy.id'))
-    data = Column(Date)
-    godzina = Column(Time)
-    id_sala = Column(Integer, ForeignKey('sale.id'))
+    id_movies = Column(Integer, ForeignKey('movies.id'))
+    date = Column(Date)
+    hour = Column(Time)
+    id_hall = Column(Integer, ForeignKey('halls.id'))
 
-    film = relationship("Film", back_populates="seanse")
-    sala = relationship("Sala", back_populates="seanse")
+    movie = relationship("Movie", back_populates="showing")
+    hall = relationship("Hall", back_populates="showing")
 
 # Model of Screening room
-class Sala(Base):
-    __tablename__ = 'sale'
+class Hall(Base):
+    __tablename__ = 'halls'
 
     id = Column(Integer, primary_key=True, index=True)
-    liczba_miejsc = Column(Integer)
-    liczba_wolnych_miejsc = Column(Integer)
+    hall_num = Column(Integer, index=True)
+    seats_amount = Column(Integer, index=True)
+    free_seats = Column(Integer, index=True)
 
-    seanse = relationship("Seans", back_populates="sala")
-    miejsca = relationship("Miejsce", back_populates="sala")
+    showings = relationship("Showing", back_populates="hall")
+    seats = relationship("Seat", back_populates="hall")
 
 # Model of Transaction
-class Transakcja(Base):
-    __tablename__ = 'transakcje'
+class Transaction(Base):
+    __tablename__ = 'transactions'
 
     id = Column(Integer, primary_key=True, index=True)
-    id_klienta = Column(Integer, ForeignKey('klienci.id'))
-    kwota = Column(Numeric(10, 2))
-    status = Column(String)
-    data = Column(Date)
+    id_users = Column(Integer, ForeignKey('users.id'))
+    amount = Column(Numeric(10, 2))
+    status = Column(String(15), index=True)
+    date = Column(Date)
 
-    klient = relationship("Klient", back_populates="transakcje")
+    user = relationship("User", back_populates="transactions")
 
 # Model of Places
-class Miejsce(Base):
-    __tablename__ = 'miejsca'
+class Seat(Base):
+    __tablename__ = 'seats'
 
     id = Column(Integer, primary_key=True, index=True)
-    numer_miejsca = Column(Integer)
-    czy_wolne = Column(Boolean, default=True)
-    id_sali = Column(Integer, ForeignKey('sale.id'))
+    id_halls = Column(Integer, ForeignKey('halls.id'))
+    seat_num = Column(Integer, index=True)
+    row = Column(Integer, index=True)
+    occupied = Column(Boolean, default=True)
 
-    sala = relationship("Sala", back_populates="miejsca")
+    hall = relationship("Hall", back_populates="seats")
+
+# Gate between tables Transactions and Sits
+class Gate(Base):
+    __tablename__ = 'gate'
+    id = Column(Integer, primary_key=True, index=True)
+    id_seats = Column(Integer, ForeignKey('seats.id'))
+    id_transaction = Column(Integer, ForeignKey('transactions.id'))
+
+    seat = relationship("Seat", back_populates="gate")
+    transaction = relationship("Transaction", back_populates="gate")
+
+Base.metadata.create_all(engine)

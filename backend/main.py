@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
-from database import SessionLocal, init_db
-from models import Klient, Film, Seans, Sala, Miejsce, Transakcja
+from database import init_db #SessionLocal
+from models import User, Movie, Hall, Sit, Gate, Showing, Transaction
 from schemas import KlientCreate, FilmCreate, SeansCreate, SalaCreate, MiejsceCreate, TransakcjaCreate
 
 # Initialize database
@@ -10,13 +10,14 @@ init_db()
 app = FastAPI()
 
 # Funkcja do pozyskiwania sesji
+'''
 def get_db():
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
-
+'''
 # Endpointy API do obsługi różnych zasobów (np. Klientów, Filmów, Seansów)
 
 @app.post("/klienci/", response_model=Klient)

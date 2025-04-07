@@ -1,15 +1,16 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, condecimal
 from datetime import datetime
 from typing import Optional
 
 # Schema for clients
-class KlientCreate(BaseModel):
-    imie: str
-    nazwisko: str
+class UserCreate(BaseModel):
+    first_name: str
+    last_name: str
+    status : str
     login: str
-    haslo: str
+    password: str
 
-class Klient(KlientCreate):
+class User(UserCreate):
     id: int
 
     class Config:
@@ -17,12 +18,10 @@ class Klient(KlientCreate):
 
 
 # Schema of movies
-class FilmCreate(BaseModel):
-    tytul: str
-    grany_od: datetime
-    grany_do: datetime
+class MovieCreate(BaseModel):
+    title: str
 
-class Film(FilmCreate):
+class Movie(MovieCreate):
     id: int
 
     class Config:
@@ -30,13 +29,13 @@ class Film(FilmCreate):
 
 
 # Schema of showing
-class SeansCreate(BaseModel):
-    id_film: int
-    data: datetime
-    godzina: datetime
-    id_sala: int
+class ShowingCreate(BaseModel):
+    id_movies: int
+    date: datetime
+    time: datetime
+    id_hall: int
 
-class Seans(SeansCreate):
+class Showing(ShowingCreate):
     id: int
 
     class Config:
@@ -44,11 +43,12 @@ class Seans(SeansCreate):
 
 
 # Schema of screening rooms
-class SalaCreate(BaseModel):
-    liczba_miejsc: int
-    liczba_wolnych_miejsc: int
+class HallCreate(BaseModel):
+    hall_num: int
+    seats_amount: int
+    free_seat: int
 
-class Sala(SalaCreate):
+class Hall(HallCreate):
     id: int
 
     class Config:
@@ -56,12 +56,14 @@ class Sala(SalaCreate):
 
 
 # Schema of places
-class MiejsceCreate(BaseModel):
-    numer_miejsca: int
-    czy_wolne: bool
-    id_sali: int
+class SeatCreate(BaseModel):
+    id_halls: int
+    seat_num: int
+    row: int
+    occupied: bool
 
-class Miejsce(MiejsceCreate):
+
+class Seat(SeatCreate):
     id: int
 
     class Config:
@@ -69,13 +71,24 @@ class Miejsce(MiejsceCreate):
 
 
 # Schema of transactions
-class TransakcjaCreate(BaseModel):
-    id_klienta: int
-    kwota: float
+class TransactionCreate(BaseModel):
+    id_user: int
+    amount: condecimal(max_digits=10, decimal_places=2)
     status: str
-    data: datetime
+    date: datetime
 
-class Transakcja(TransakcjaCreate):
+class Transaction(TransactionCreate):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+
+class GatesCreate(BaseModel):
+    id_transaction: int
+    id_seats: int
+
+class Gates(GatesCreate):
     id: int
 
     class Config:
