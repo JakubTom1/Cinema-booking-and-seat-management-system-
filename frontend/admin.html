@@ -1,10 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+  <meta charset="UTF-8">
+  <title>Cinema</title>
+  <style>
+    .tabs {
+      display: flex;
+      cursor: pointer;
+    }
+
+    .tab {
+      font-size: 20px;
+      padding: 15px 30px;
+      width: 100px;
+      height: 30px;
+      background: lightgray;
+      border: 1px solid #ccc;
+      margin-right: 2px;
+    }
+
+    .tab-content {
+      display: none;
+      padding: 30px;
+      border: 1px solid #ccc;
+      border-top: none;
+    }
+
+    .active-tab {
+      background: white;
+      border-bottom: none;
+    }
+
+    .active-content {
+      display: block;
+    }
+  </style>
 </head>
 <body>
+  <h1 style="text-align: center; padding: 20px; background-color: lightblue;">Happy AGH Cinema</h1>
+
+<div class="tabs">
+  <div class="tab active-tab" onclick="openTab(event, 'tab1')">Zakładka 1</div>
+  <div class="tab" onclick="openTab(event, 'tab2')">Zakładka 2</div>
+  <div class="tab" onclick="openTab(event, 'tab3')">Zakładka 3</div>
+</div>
+
+<div id="tab1" class="tab-content active-content">
+  <p>Treść zakładki 1</p>
+</div>
+<div id="tab2" class="tab-content">
+  <p>Treść zakładki 2</p>
+</div>
+<div id="tab3" class="tab-content">
+  <p>Treść zakładki 3</p>
+</div>
+
+<script>
+  function openTab(evt, tabId) {
+    const tabs = document.querySelectorAll('.tab');
+    const contents = document.querySelectorAll('.tab-content');
+
+    tabs.forEach(tab => tab.classList.remove('active-tab'));
+    contents.forEach(content => content.classList.remove('active-content'));
+
+    evt.currentTarget.classList.add('active-tab');
+    document.getElementById(tabId).classList.add('active-content');
+  }
+</script>
 
 </body>
 </html>

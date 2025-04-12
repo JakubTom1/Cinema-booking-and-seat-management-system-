@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 from database import init_db #SessionLocal
-from models import User, Movie, Hall, Sit, Gate, Showing, Transaction
+from models import User, Movie, Hall, Seat, Gate, Showing, Transaction
 from schemas import KlientCreate, FilmCreate, SeansCreate, SalaCreate, MiejsceCreate, TransakcjaCreate
 
 # Initialize database
