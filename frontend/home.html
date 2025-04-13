@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="stylesheet.css">
+    <script src="main.js"></script>
+    <script>
+        const days = {
+            "Pn": "2025-05-12",
+            "Wt": "2025-05-13",
+            "Śr": "2025-05-14",
+            "Czw": "2025-05-15",
+            "Pt": "2025-05-16"
+        };
+        let params = new URLSearchParams(window.location.search);
+        if (!params.has("date")) {
+            selectDay('Pn')
+            params = new URLSearchParams(window.location.search);
+        }
+        let chosenDate = params.get("date");
+
+        function goToReservation(filmTitle, time, date) {
+            const url = `reservation.html?film=${encodeURIComponent(filmTitle)}&time=${encodeURIComponent(time)}&date=${encodeURIComponent(date)}`;
+            window.location.href = url;
+        }
+
+ 
+
+        function selectDay(dayLabel) {
+            const date = days[dayLabel];
+            if (date) {
+                window.location.href = `home.html?date=${date}`;
+            }
+            params = new URLSearchParams(window.location.search);
+            chosenDate = params.get("date");
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const params = new URLSearchParams(window.location.search);
+            const currentDate = params.get("date");
+            const buttons = document.querySelectorAll(".day-button");
+            buttons.forEach(btn => {
+                if (days[btn.innerText] === currentDate) {
+                btn.classList.add("active");
+                }
+            });
+        });
+      </script>
+</head>
+<body>
+    <header>
+      <h1>Super Kino</h1>
+      <p class="date">Repertuar</p>
+      <div class="day-buttons">
+        <button class="day-button" onclick="selectDay('Pn')">Pn</button>
+        <button class="day-button" onclick="selectDay('Wt')">Wt</button>
+        <button class="day-button" onclick="selectDay('Śr')">Śr</button>
+        <button class="day-button" onclick="selectDay('Czw')">Czw</button>
+        <button class="day-button" onclick="selectDay('Pt')">Pt</button>
+      </div>
+    </header>
+  
+    <main class="films">
+      <section class="film">
+        <img src="https://via.placeholder.com/150x220.png?text=Film+1" alt="Film 1" />
+        <div class="info">
+          <h2>Film 1: Wielka Przygoda</h2>
+          <div class="showtimes">
+            <button onclick="goToReservation('Wielka Przygoda', this.innerText, chosenDate)">12:00</button>
+            <button onclick="goToReservation('Wielka Przygoda', this.innerText, chosenDate)">14:30</button>
+            <button onclick="goToReservation('Wielka Przygoda', this.innerText, chosenDate)">17:00</button>
+            <button onclick="goToReservation('Wielka Przygoda', this.innerText, chosenDate)">19:30</button>
+          </div>
+        </div>
+      </section>
+  
+      <section class="film">
+        <img src="https://via.placeholder.com/150x220.png?text=Film+2" alt="Film 2" />
+        <div class="info">
+          <h2>Film 2: Nocny Patrol</h2>
+          <div class="showtimes">
+            <button onclick="goToReservation('Nocny Patrol', this.innerText, chosenDate)">13:15</button>
+            <button onclick="goToReservation('Nocny Patrol', this.innerText, chosenDate)">15:45</button>
+            <button onclick="goToReservation('Nocny Patrol', this.innerText, chosenDate)">18:15</button>
+          </div>
+        </div>
+      </section>
+  
+      <section class="film">
+        <img src="https://via.placeholder.com/150x220.png?text=Film+3" alt="Film 3" />
+        <div class="info">
+          <h2>Film 3: Kosmiczna Misja</h2>
+          <div class="showtimes">
+            <button onclick="goToReservation('Kosmiczna Misja', this.innerText, chosenDate)">11:00</button>
+            <button onclick="goToReservation('Kosmiczna Misja', this.innerText, chosenDate)">16:00</button>
+            <button onclick="goToReservation('Kosmiczna Misja', this.innerText, chosenDate)">20:00</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

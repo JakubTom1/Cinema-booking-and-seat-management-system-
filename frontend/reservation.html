@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservation</title>
+    <link rel="stylesheet" href="stylesheet.css">
+    <script src="main.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const params = new URLSearchParams(window.location.search);
+            const film = params.get("film");
+            const time = params.get("time");
+            const date = params.get("date") || "Nieznana data";
+            const headerDate = document.querySelector(".date");
+
+            if (film && headerDate) {
+                headerDate.textContent = `Rezerwacja miejsc na seans: ${film} | ${date}, godz. ${time}`;
+            }
+
+            const seats = document.querySelectorAll(".seat:not(.occupied)");
+
+            seats.forEach(seat => {
+                seat.addEventListener("click", () => {
+                seat.classList.toggle("selected");
+                updateSelectionInfo();
+                });
+            });
+
+            function updateSelectionInfo() {
+                const selectedSeats = document.querySelectorAll(".seat.selected");
+                const seatIds = Array.from(selectedSeats).map(seat => seat.id);
+                document.querySelector("#selected-seats").textContent = seatIds.length > 0 
+                ? `Wybrane miejsca: ${seatIds.join(", ")}`
+                : "Brak wybranych miejsc.";
+            }
+    });
+      </script>
+</head>
+<body>
+    <header>
+      <h1>Super Kino</h1>
+      <p class="date">Rezerwacja miejsc na seans</p>
+    </header>
+  
+    <main class="seating-layout">
+      <div class="screen">Ekran</div>
+      <div class="seats">
+        <!-- Rzędy A - B, po 10 miejsc w każdym -->
+        <div class="row" id="row-A">
+          <span class="row-label">A</span>
+          <button class="seat" id="A1">1</button>
+          <button class="seat" id="A2">2</button>
+          <button class="seat occupied" id="A3">3</button>
+          <button class="seat" id="A4">4</button>
+          <button class="seat" id="A5">5</button>
+          <button class="seat" id="A6">6</button>
+          <button class="seat" id="A7">7</button>
+          <button class="seat" id="A8">8</button>
+          <button class="seat" id="A9">9</button>
+          <button class="seat" id="A10">10</button>
+        </div>
+        <div class="row" id="row-B">
+          <span class="row-label">B</span>
+          <button class="seat" id="B1">1</button>
+          <button class="seat" id="B2">2</button>
+          <button class="seat occupied" id="B3">3</button>
+          <button class="seat" id="B4">4</button>
+          <button class="seat" id="B5">5</button>
+          <button class="seat" id="B6">6</button>
+          <button class="seat" id="B7">7</button>
+          <button class="seat" id="B8">8</button>
+          <button class="seat" id="B9">9</button>
+          <button class="seat" id="B10">10</button>
+        </div>
+        <div class="row" id="row-C">
+            <span class="row-label">C</span>
+            <button class="seat" id="C1">1</button>
+            <button class="seat" id="C2">2</button>
+            <button class="seat" id="C3">3</button>
+            <button class="seat" id="C4">4</button>
+            <button class="seat" id="C5">5</button>
+            <button class="seat" id="C6">6</button>
+            <button class="seat occupied" id="C7">7</button>
+            <button class="seat" id="C8">8</button>
+            <button class="seat" id="C9">9</button>
+            <button class="seat" id="C10">10</button>
+          </div>
+      </div>
+
+      <div class="legend">
+        <div class="legend-item"><div class="legend-color available"></div> Wolne</div>
+        <div class="legend-item"><div class="legend-color selected"></div> Wybrane</div>
+        <div class="legend-item"><div class="legend-color occupied"></div> Zajęte</div>
+      </div>
+
+      <div id="selected-seats" style="margin-top: 20px; font-weight: bold;">Brak wybranych miejsc.</div>
+      
+      <div class="navigation-buttons">
+        <button class="nav-button" onclick="window.location.href='home.html'">Wróć</button>
+        <button class="nav-button" id="dalejBtn" onclick="alert('Przechodzimy dalej...')">Dalej</button>
+      </div>
+    </main>
+  </body>
+</html>
