@@ -1,17 +1,11 @@
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).resolve().parent))
+
+
 from sqlalchemy import Column, Integer, String, Date, Time, ForeignKey, Boolean, Numeric
-from sqlalchemy.orm import relationship
-#from database import Base, engine
-
-# kwestie technicze to będzie do usunięcia
-from sqlalchemy import create_engine, MetaData
-from sqlalchemy.orm import declarative_base
-
-# Connection to MySQL database
-url_address = "mysql+pymysql://szewcza1:rswiw3r376trLrTi@mysql.agh.edu.pl:3306/szewcza1"
-engine = create_engine(url_address)
-Base = declarative_base()
-metadata = MetaData()
-# dotąd
+from sqlalchemy.orm import relationship, backref
+from database import Base
 
 # Model of Clients
 class User(Base):
@@ -24,16 +18,12 @@ class User(Base):
     login = Column(String(15), unique=True, index=True)
     password = Column(String(15), unique=True, index=True)
 
-    transactions = relationship("Transaction", back_populates="user")
-
 # Model of Movies
 class Movie(Base):
     __tablename__ = 'movies'
 
     id = Column(Integer, primary_key=True, index=True)
     tittle = Column(String(50), index=True)
-
-    showings = relationship("Showing", back_populates="movie")
 
 # Model of Showing
 class Showing(Base):
@@ -45,9 +35,8 @@ class Showing(Base):
     hour = Column(Time)
     id_hall = Column(Integer, ForeignKey('halls.id'))
 
-    movie = relationship("Movie", back_populates="showing")
-    hall = relationship("Hall", back_populates="showing")
-
+    movie = relationship("Movie", backref=backref("showings", cascade="all, delete-orphan"))
+    hall = relationship("Hall", backref=backref("showings", uselist=False))
 # Model of Screening room
 class Hall(Base):
     __tablename__ = 'halls'
@@ -56,9 +45,6 @@ class Hall(Base):
     hall_num = Column(Integer, index=True)
     seats_amount = Column(Integer, index=True)
     free_seats = Column(Integer, index=True)
-
-    showings = relationship("Showing", back_populates="hall")
-    seats = relationship("Seat", back_populates="hall")
 
 # Model of Transaction
 class Transaction(Base):
@@ -70,7 +56,7 @@ class Transaction(Base):
     status = Column(String(15), index=True)
     date = Column(Date)
 
-    user = relationship("User", back_populates="transactions")
+    user = relationship("User", backref=backref("transactions"))
 
 # Model of Places
 class Seat(Base):
@@ -82,7 +68,8 @@ class Seat(Base):
     row = Column(Integer, index=True)
     occupied = Column(Boolean, default=True)
 
-    hall = relationship("Hall", back_populates="seats")
+    hall = relationship("Hall", backref=backref("seats"))
+    gate = relationship("Gate", backref=backref("seats", uselist=False))
 
 # Gate between tables Transactions and Sits
 class Gate(Base):
@@ -91,7 +78,4 @@ class Gate(Base):
     id_seats = Column(Integer, ForeignKey('seats.id'))
     id_transaction = Column(Integer, ForeignKey('transactions.id'))
 
-    seat = relationship("Seat", back_populates="gate")
-    transaction = relationship("Transaction", back_populates="gate")
-
-Base.metadata.create_all(engine)
+    transaction = relationship("Transaction", backref=backref("gate"))

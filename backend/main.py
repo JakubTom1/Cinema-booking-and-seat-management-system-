@@ -1,39 +1,108 @@
-from fastapi import FastAPI, Depends
-from sqlalchemy.orm import Session
-from database import init_db #SessionLocal
-from models import User, Movie, Hall, Seat, Gate, Showing, Transaction
-from schemas import KlientCreate, FilmCreate, SeansCreate, SalaCreate, MiejsceCreate, TransakcjaCreate
+"""
+Główny moduł aplikacji FastAPI, definiujący endpointy API.
+"""
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).resolve().parent))
 
-# Initialize database
+from fastapi import FastAPI, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+from datetime import timedelta, date as DateType
+from database import init_db, get_db
+from models import User, Movie, Hall, Seat, Gate, Showing, Transaction
+from schemas import *
+from fastapi.middleware.cors import CORSMiddleware
+from auth import *
+from fastapi.security import OAuth2PasswordRequestForm
+from api_docs import API_TAGS
+
+# Inicjalizacja bazy danych
 init_db()
 
-app = FastAPI()
+# Tworzenie instancji aplikacji FastAPI
+app = FastAPI(
+    title="Cinema Booking System",
+    description="API for cinema booking and seat management system",
+    version="1.0.0",
+    openapi_tags=API_TAGS
+)
 
-# Funkcja do pozyskiwania sesji
-'''
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-'''
-# Endpointy API do obsługi różnych zasobów (np. Klientów, Filmów, Seansów)
+# Konfiguracja CORS
+origins = ["http://localhost:3000", "http://localhost:8080"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-@app.post("/klienci/", response_model=Klient)
-def create_klient(klient: KlientCreate, db: Session = Depends(get_db)):
-    db_klient = Klient(imie=klient.imie, nazwisko=klient.nazwisko, login=klient.login, haslo=klient.haslo)
-    db.add(db_klient)
+@app.get("/movies/{date}", response_model=list[ShowingResponse], tags=["movies"])
+def get_movies_by_date(date: DateType, db: Session = Depends(get_db)):
+    """
+    Pobiera wszystkie seanse filmowe dla podanej daty.
+    """
+    showings = db.query(Showing).filter(Showing.date == date).all()
+    if not showings:
+        raise HTTPException(status_code=404, detail="No showings found for this date")
+    return showings
+
+@app.get("/seats/{showing_id}", response_model=list[SeatResponse], tags=["seats"])
+def get_seats_for_showing(showing_id: int, db: Session = Depends(get_db)):
+    """
+    Pobiera wszystkie miejsca dla konkretnego seansu.
+    """
+    seats = db.query(Seat).join(Hall).join(Showing).filter(Showing.id == showing_id).all()
+    return seats
+
+@app.post("/reservations/", response_model=TransactionResponse, tags=["reservations"])
+def create_reservation(reservation: TransactionCreate, db: Session = Depends(get_db)):
+    """
+    Tworzy nową rezerwację na podstawie przesłanych danych.
+    """
+    new_transaction = Transaction(**reservation.dict())
+    db.add(new_transaction)
     db.commit()
-    db.refresh(db_klient)
-    return db_klient
+    db.refresh(new_transaction)
+    return new_transaction
 
-@app.post("/filmy/", response_model=Film)
-def create_film(film: FilmCreate, db: Session = Depends(get_db)):
-    db_film = Film(tytul=film.tytul, grany_od=film.grany_od, grany_do=film.grany_do)
-    db.add(db_film)
+@app.post("/register", response_model=UserResponse, tags=["users"])
+def register_user(user: UserCreate, db: Session = Depends(get_db)):
+    """
+    Rejestruje nowego użytkownika w systemie.
+    """
+    db_user = User(
+        login=user.login,
+        password=get_password_hash(user.password),
+        name=user.name,
+        email=user.email
+    )
+    db.add(db_user)
     db.commit()
-    db.refresh(db_film)
-    return db_film
+    db.refresh(db_user)
+    return db_user
 
-# Można dodać więcej endpointów dla Seansów, Sal, Miejsc i Transakcji
+@app.post("/token", response_model=Token, tags=["auth"])
+def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    """
+    Loguje użytkownika i generuje token dostępu.
+    """
+    user = db.query(User).filter(User.login == form_data.username).first()
+    if not user or not verify_password(form_data.password, user.password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.login}, expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@app.get("/users/me/", response_model=UserResponse, tags=["users"])
+def read_users_me(current_user: User = Depends(get_current_user)):
+    """
+    Pobiera informacje o aktualnie zalogowanym użytkowniku.
+    """
+    return current_user
