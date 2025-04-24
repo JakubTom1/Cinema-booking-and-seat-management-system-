@@ -20,7 +20,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     first_name = Column(String(15), index=True)
     last_name = Column(String(15), index=True)
-    status = Column(String(15), unique=True, index=True) # client, cinema staff or admin
+    status = Column(Integer, index=True) # client(2), cinema staff(1) or admin(0)
     login = Column(String(15), unique=True, index=True)
     password = Column(String(15), unique=True, index=True)
 
