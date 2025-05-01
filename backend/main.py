@@ -1,3 +1,53 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from database import engine
+from sqlalchemy import text
+
+# Tworzenie aplikacji FastAPI
+app = FastAPI()
+
+# Dodaj CORS middleware
+# Fast Api działa na 8000, a tutaj dostaje dostęp do portu na którym działą strona
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:63342"],  # Zezwól na dostęp z tego portu
+    allow_credentials=True,
+    allow_methods=["*"],  # Zezwól na wszystkie metody (GET, POST itd.)
+    allow_headers=["*"],  # Zezwól na wszystkie nagłówki
+)
+
+def json_maker(query:text):
+    with engine.connect() as conn:
+        result = conn.execute(query)
+        movies = [dict(row._mapping) for row in result]
+    return movies
+
+@app.get("/movies")
+def get_movies():
+    query =text(
+    """
+    select *
+    from movies
+    """
+    )
+    # query all movies
+    return json_maker(query)
+
+@app.get("/week")
+def get_week():
+    query =(
+        """
+        select weekday(c.date)
+        from calendar as c
+        where c.date >= curdate()
+        order by c.date asc
+        limit 7
+        """
+    )
+    # query the newest week days
+    return json_maker(query)
+
+'''
 """
 Główny moduł aplikacji FastAPI, definiujący endpointy API.
 """
@@ -106,3 +156,4 @@ def read_users_me(current_user: User = Depends(get_current_user)):
     Pobiera informacje o aktualnie zalogowanym użytkowniku.
     """
     return current_user
+'''

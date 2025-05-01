@@ -2,7 +2,7 @@
 Moduł odpowiedzialny za konfigurację bazy danych i zarządzanie sesjami.
 """
 
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import create_engine, MetaData, text
 from sqlalchemy.orm import declarative_base, sessionmaker
 from typing import Generator
 

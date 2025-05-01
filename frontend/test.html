@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Movie List</title>
+</head>
+<body>
+    <h1>Movie List</h1>
+    <table border="1" id="movies-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Wiersze zostaną dodane przez JavaScript -->
+        </tbody>
+    </table>
+
+    <script>
+        fetch("http://127.0.0.1:8000/movies")
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.getElementById("movies-table").getElementsByTagName("tbody")[0];
+                data.forEach(movie => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>${movie.id}</td>
+                        <td>${movie.tittle}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error("Error loading movies:", error);
+            });
+    </script>
+</body>
+</html>
