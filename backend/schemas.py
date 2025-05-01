@@ -1,181 +1,164 @@
-"""
-Moduł definiujący schematy Pydantic używane do walidacji danych wejściowych i wyjściowych.
-"""
+from pydantic import BaseModel
+from typing import Optional
+from datetime import date, time, datetime
+from decimal import Decimal
 
-from pydantic import BaseModel, condecimal, EmailStr
-from datetime import datetime
-from typing import Optional, List
+# input schemas
 
-# Token schema
-class Token(BaseModel):
-    """
-    Schemat reprezentujący token dostępu.
-    """
-    access_token: str
-    token_type: str
-
-# Schema for clients
+# USER
 class UserCreate(BaseModel):
-    """
-    Schemat danych wejściowych dla rejestracji użytkownika.
-    """
     first_name: str
     last_name: str
-    status: str
+    status: Optional[int] = 2
     login: str
     password: str
 
-class UserResponse(BaseModel):
-    """
-    Schemat danych wyjściowych dla użytkownika.
-    """
+
+# MOVIE
+class MovieCreate(BaseModel):
+    tittle: str
+
+
+# PRICELIST
+class PricelistCreate(BaseModel):
+    type: str
+    ticket_price: Decimal
+
+
+# CALENDAR
+class CalendarCreate(BaseModel):
+    date: datetime
+
+
+# HALL
+class HallCreate(BaseModel):
+    hall_num: int
+    seats_amount: int
+
+
+# SEAT
+class SeatCreate(BaseModel):
+    id_halls: int
+    seat_num: int
+    row: int
+    occupied: Optional[bool] = False
+
+
+# SHOWING
+class ShowingCreate(BaseModel):
+    id_movies: int
+    id_hall: int
+    id_date: int
+    hour: time
+
+
+# TRANSACTION
+class TransactionCreate(BaseModel):
+    id_users: int
+    id_showings: int
+    status: str
+    date: date
+
+
+# TICKET
+class TicketCreate(BaseModel):
+    id_transaction: int
+    id_pricelist: int
+
+# output schemas
+
+# USER
+class UserRead(BaseModel):
     id: int
     first_name: str
     last_name: str
-    status: str
+    status: int
     login: str
 
     class Config:
         orm_mode = True
 
-# Schema of movies
-class MovieCreate(BaseModel):
-    title: str
 
-class Movie(MovieCreate):
-    """
-    Schemat danych wyjściowych dla filmu.
-    """
-
+# MOVIE
+class MovieRead(BaseModel):
     id: int
+    tittle: str
 
     class Config:
         orm_mode = True
 
 
-# Schema of showing
-class ShowingCreate(BaseModel):
-    """
-    Schemat danych wejściowych dla tworzenia nowego seansu filmowego.
-    """
-    id_movies: int
-    date: datetime
-    time: datetime
-    id_hall: int
-
-class ShowingSchema(ShowingCreate):
-    """
-        Schemat danych wyjściowych dla seansu filmowego.
-        """
+# PRICELIST
+class PricelistRead(BaseModel):
     id: int
+    type: str
+    ticket_price: Decimal
 
-# Schema of screening rooms
-class HallCreate(BaseModel):
-    """
-    Schemat danych wejściowych dla tworzenia nowej sali kinowej.
-    """
+    class Config:
+        orm_mode = True
+
+
+# CALENDAR
+class CalendarRead(BaseModel):
+    id: int
+    date: datetime
+
+    class Config:
+        orm_mode = True
+
+
+# HALL
+class HallRead(BaseModel):
+    id: int
     hall_num: int
     seats_amount: int
-    free_seats: int
-
-class Hall(HallCreate):
-    """
-    Schemat danych wyjściowych dla sali kinowej.
-    """
-    id: int
+    free_seats: Optional[int]
 
     class Config:
         orm_mode = True
 
 
-# Schema of places
-class SeatCreate(BaseModel):
-    """
-    Schemat danych wejściowych dla tworzenia nowego miejsca w sali kinowej.
-    """
+# SEAT
+class SeatRead(BaseModel):
+    id: int
     id_halls: int
     seat_num: int
     row: int
     occupied: bool
 
-class ShowingResponse(BaseModel):
-    """
-    Schemat danych wyjściowych dla seansu filmowego, zawierający szczegóły filmu i sali.
-    """
+    class Config:
+        orm_mode = True
+
+
+# SHOWING
+class ShowingRead(BaseModel):
     id: int
-    movie: Movie
     id_movies: int
-    date: datetime
-    time: datetime
-    hall: Hall
-
-    class Config:
-        orm_mode = True
-
-class Seat(SeatCreate):
-    """
-    Schemat danych wyjściowych dla miejsca w sali kinowej.
-    """
-    id: int
-
-class SeatResponse(BaseModel):
-    """
-    Schemat danych wyjściowych dla miejsca w sali kinowej, zawierający dodatkowe informacje.
-    """
-    id: int
-    seat_num: int
-    row: int
-    occupied: bool
-    hall_id: int
-    showing_id: Optional[int]
+    id_hall: int
+    id_date: int
+    hour: time
 
     class Config:
         orm_mode = True
 
 
-# Schema of transactions
-class TransactionCreate(BaseModel):
-    """
-    Schemat danych wejściowych dla tworzenia nowej transakcji (rezerwacji).
-    """
-    id_user: int
-    amount: condecimal(max_digits=10, decimal_places=2)
+# TRANSACTION
+class TransactionRead(BaseModel):
+    id: int
+    id_users: int
+    id_showings: int
     status: str
-    date: datetime
-
-class Transaction(TransactionCreate):
-    """
-    Schemat danych wyjściowych dla transakcji (rezerwacji).
-    """
-    id: int
-
-class TransactionResponse(BaseModel):
-    """
-    Schemat danych wyjściowych dla transakcji, zawierający szczegóły miejsc.
-    """
-    id: int
-    user_id: int
-    amount: condecimal(max_digits=10, decimal_places=2)
-    status: str
-    date: datetime
-    seats: List[SeatResponse]
+    date: date
 
     class Config:
         orm_mode = True
 
 
-class GatesCreate(BaseModel):
-    """
-    Schemat danych wejściowych dla połączenia transakcji z miejscem.
-    """
+# TICKET
+class TicketRead(BaseModel):
+    id: int
     id_transaction: int
-    id_seats: int
-
-class Gates(GatesCreate):
-    """
-    Schemat danych wyjściowych dla połączenia transakcji z miejscem.
-    """
-    id: int
+    id_pricelist: int
 
     class Config:
         orm_mode = True
