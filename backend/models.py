@@ -54,7 +54,6 @@ class Hall(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     hall_num = Column(Integer, index=True)
     seats_amount = Column(Integer, index=True)
-    free_seats = Column(Integer, index=True, default=seats_amount)
 
     seats = relationship("Seat", backref=backref("hall"))
     showings = relationship("Showing", backref=backref("hall"))

@@ -113,7 +113,6 @@ class HallRead(BaseModel):
     id: int
     hall_num: int
     seats_amount: int
-    free_seats: Optional[int]
 
     class Config:
         orm_mode = True
