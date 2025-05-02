@@ -64,6 +64,7 @@ class TransactionCreate(BaseModel):
 class TicketCreate(BaseModel):
     id_transaction: int
     id_pricelist: int
+    id_seats: int
 
 # output schemas
 
@@ -159,6 +160,7 @@ class TicketRead(BaseModel):
     id: int
     id_transaction: int
     id_pricelist: int
+    id_seats: int
 
     class Config:
         orm_mode = True

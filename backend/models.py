@@ -69,6 +69,8 @@ class Seat(Base):
     row = Column(Integer, index=True)
     occupied = Column(Boolean, default=False)
 
+    tickets = relationship("Ticket", backref=backref("seat"))
+
 # Model of Showing
 class Showing(Base):
     __tablename__ = 'showings'
@@ -100,5 +102,6 @@ class Ticket(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     id_transaction = Column(Integer, ForeignKey('transactions.id'))
     id_pricelist = Column(Integer, ForeignKey('pricelist.id'))
+    id_seat = Column(Integer, ForeignKey('seats.id'))
 
 Base.metadata.create_all(engine)
