@@ -41,7 +41,6 @@ class SeatCreate(BaseModel):
     id_halls: int
     seat_num: int
     row: int
-    occupied: Optional[bool] = False
 
 
 # SHOWING
@@ -124,7 +123,6 @@ class SeatRead(BaseModel):
     id_halls: int
     seat_num: int
     row: int
-    occupied: bool
 
     class Config:
         orm_mode = True

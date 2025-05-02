@@ -16,15 +16,15 @@ app.add_middleware(
     allow_headers=["*"],  # Zezwól na wszystkie nagłówki
 )
 
-def json_maker(query:text):
+def json_maker(query:str):
     with engine.connect() as conn:
-        result = conn.execute(query)
+        result = conn.execute(text(query))
         movies = [dict(row._mapping) for row in result]
     return movies
 
 @app.get("/movies")
 def get_movies():
-    query =text(
+    query =(
     """
     select *
     from movies
@@ -46,6 +46,17 @@ def get_week():
     )
     # query the newest week days
     return json_maker(query)
+
+@app.get("/pricelist")
+def get_prices():
+    query =(
+        """
+        select p.type, p.ticket_price
+        from pricelist as p
+        """
+    )
+    return json_maker(query)
+
 
 '''
 """

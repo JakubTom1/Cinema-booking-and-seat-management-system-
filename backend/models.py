@@ -66,7 +66,6 @@ class Seat(Base):
     id_halls = Column(Integer, ForeignKey('halls.id'))
     seat_num = Column(Integer, index=True)
     row = Column(Integer, index=True)
-    occupied = Column(Boolean, default=False)
 
     tickets = relationship("Ticket", backref=backref("seat"))
 
