@@ -1,19 +1,57 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from backend.crud.tickets import create_tickets, get_tickets_by_transaction
+from backend.crud.transactions import create_transaction
+from backend.schemas import TicketCreate, TransactionCreate
 from backend.database import get_db
-from backend.models import Reservation
-from backend.schemas import ReservationCreate
-
+from backend.models import Showing, Seat, Ticket
+from typing import List
 router = APIRouter()
 
+@router.get("/reservations/{showing_id}")
+def get_seats_for_showing(showing_id: int, db: Session = Depends(get_db)):
+    # Krok 1: Znajdź seans
+    showing = db.query(Showing).filter(Showing.id == showing_id).first()
+    if not showing:
+        raise HTTPException(status_code=404, detail="Showing not found")
 
-@router.post("/")
-def create_reservation(reservation: ReservationCreate, db: Session = Depends(get_db)):
-    existing_reservation = db.query(Reservation).filter_by(seat_number=reservation.seat_number).first()
-    if existing_reservation:
-        raise HTTPException(status_code=400, detail="Miejsce już zajęte!")
+    # Krok 2: Znajdź miejsca z sali przypisanej do seansu
+    seats = db.query(Seat).filter(Seat.id_halls == showing.id_hall).all()
 
-    new_reservation = Reservation(movie_id=reservation.movie_id, seat_number=reservation.seat_number)
-    db.add(new_reservation)
-    db.commit()
-    return {"message": "Rezerwacja udana"}
+    # Krok 3: Dla każdego miejsca sprawdź, czy istnieje ticket z tym seat.id i showing_id
+    results = []
+    for seat in seats:
+        is_taken = (
+                db.query(Ticket)
+                .join(Showing, Ticket.transaction.has(id_showings=Showing.id))
+                .filter(
+                    Ticket.id_seat == seat.id,
+                    Showing.id == showing_id
+                )
+                .first() is not None
+        )
+
+        results.append({
+            "seat_id": seat.id,
+            "row": seat.row,
+            "seat_num": seat.seat_num,
+            "is_taken": is_taken
+        })
+
+    return results
+
+@router.post("/transactions")
+def make_transaction(transaction: TransactionCreate, db: Session = Depends(get_db)):
+    return create_transaction(db, transaction)
+
+@router.post("/tickets/bulk")
+def reserve_tickets(tickets: List[TicketCreate], db: Session = Depends(get_db)):
+    try:
+        return create_tickets(db, tickets)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/tickets/{transaction_id}")
+def tickets_by_transaction(transaction_id: int, db: Session = Depends(get_db)):
+    return get_tickets_by_transaction(db, transaction_id)
+

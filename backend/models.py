@@ -80,7 +80,6 @@ class Showing(Base):
     hour = Column(Time)
 
     transactions = relationship("Transaction", backref=backref("showing"))
-
 # Model of Transaction
 class Transaction(Base):
     __tablename__ = 'transactions'
@@ -91,7 +90,6 @@ class Transaction(Base):
     status = Column(String(15), index=True)
     date = Column(Date)
 
-    user = relationship("User", backref=backref("transaction"))
     tickets = relationship("Ticket", backref=backref("transaction"))
 
 # Model of Ticket

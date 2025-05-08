@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+'''from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import engine
 from sqlalchemy import text
@@ -58,7 +58,7 @@ def get_prices():
     return json_maker(query)
 
 
-'''
+
 """
 Główny moduł aplikacji FastAPI, definiujący endpointy API.
 """
@@ -167,4 +167,34 @@ def read_users_me(current_user: User = Depends(get_current_user)):
     Pobiera informacje o aktualnie zalogowanym użytkowniku.
     """
     return current_user
-'''
+    '''
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from backend.database import init_db
+from backend.routes import auth, movies, showings, reservations, admin, reports, programme
+
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+init_db()
+
+#app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
+app.include_router(movies.router, prefix="/movies", tags=["Movies"])
+app.include_router(showings.router, prefix="/showings", tags=["Showings"])
+app.include_router(reservations.router, prefix="/reservations", tags=["Reservations"])
+#app.include_router(admin.router, prefix="/admin", tags=["Admin"])
+#app.include_router(reports.router, prefix="/reports", tags=["Reports"])
+app.include_router(programme.router, prefix = "", tags=["Programme"])
+
+@app.get("/")
+def root():
+    return {"message": "Cinema booking API is running."}
+
