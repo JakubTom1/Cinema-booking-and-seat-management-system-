@@ -186,7 +186,7 @@ app.add_middleware(
 
 init_db()
 
-#app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
+app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 app.include_router(movies.router, prefix="/movies", tags=["Movies"])
 app.include_router(showings.router, prefix="/showings", tags=["Showings"])
 app.include_router(reservations.router, prefix="/reservations", tags=["Reservations"])
