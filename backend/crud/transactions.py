@@ -17,12 +17,3 @@ def create_transaction(db: Session, transaction: TransactionCreate):
 
 def get_transactions_by_user(db: Session, user_id: int):
     return db.query(Transaction).filter(Transaction.id_users == user_id).all()
-
-def delete_transaction(db: Session, transaction: Transaction):
-    db_transaction = db.query(Transaction).filter(Transaction.id == transaction.id).first()
-    if db_transaction:
-        # Delete associated tickets first
-        db.query(Ticket).filter(Ticket.id_transaction == transaction.id).delete()
-        db.delete(db_transaction)
-        db.commit()
-    return db_transaction

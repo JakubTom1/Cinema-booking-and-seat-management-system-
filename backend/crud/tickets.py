@@ -2,8 +2,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import and_, text
 from fastapi import HTTPException
-from backend.models import Ticket, Transaction
-from backend.schemas import TicketCreate
+from backend.models import Ticket, Transaction, Pricelist
+from backend.schemas import TicketCreate, PricelistRead, TicketRead
 from typing import List
 
 def is_seat_available(db: Session, seat_id: int, showing_id: int) -> bool:
@@ -12,7 +12,8 @@ def is_seat_available(db: Session, seat_id: int, showing_id: int) -> bool:
         .join(Transaction, Ticket.id_transaction == Transaction.id)
         .filter(and_(
             Ticket.id_seat == seat_id,
-            Transaction.id_showings == showing_id
+            Transaction.id_showings == showing_id,
+            Transaction.status != 'cancelled'
         ))
         .first()
     )
@@ -58,3 +59,77 @@ def create_tickets(db: Session, tickets: List[TicketCreate]):
 def get_tickets_by_transaction(db: Session, transaction_id: int):
     # Retrieve all tickets associated with the given transaction ID
     return db.query(Ticket).filter(Ticket.id_transaction == transaction_id).all()
+
+
+def delete_tickets(db: Session, tickets: List[TicketRead]):
+    try:
+        if tickets and len(tickets) > 0:
+            transaction_id = tickets[0].id_transaction
+
+            for ticket in tickets:
+                db.delete(ticket)
+
+            transaction = db.query(Transaction).filter(Transaction.id == transaction_id).first()
+            if transaction:
+                transaction.status = 'cancelled'
+            else:
+                raise HTTPException(status_code=404, detail="Transaction not found")
+
+        db.commit()
+        return {"message": "Tickets deleted and transaction cancelled successfully"}
+
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error deleting tickets: {str(e)}")
+    # Delete tickets from database and set transaction to "cancelled"
+
+def get_pricelist(db: Session, pricelist: List[PricelistRead]):
+    query = (
+        db.query(pricelist)
+             .all()
+    )
+    return query
+
+def ticket_info(db: Session):
+    query = db.execute(text("""
+    SELECT
+        t.id,
+        p.ticket_price,
+        s.seat_num,
+        s.row,
+        h.hall_num,
+        c.date,
+        sh.hour,
+        m.tittle
+    FROM tickets as t
+    INNER JOIN transactions as tr on tr.id=t.id_transaction
+    INNER JOIN showings as sh on sh.id=tr.id_showings
+    INNER JOIN pricelist as p on p.id=t.id_pricelist
+    INNER JOIN seats as s on t.id_seat=s.id
+    INNER JOIN halls as h on h.id=s.id_halls
+    INNER JOIN movies as m on m.id=sh.id_movies
+    INNER JOIN calendar as c on c.id=sh.id_date
+    """))
+    # query full information about the tickets
+    return query.all()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

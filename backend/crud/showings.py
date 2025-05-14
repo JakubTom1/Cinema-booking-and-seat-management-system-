@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
-from backend.models import Showing
+from backend.models import Showing, Calendar, Movie
 from backend.schemas import ShowingCreate
-
+from datetime import datetime, timedelta
 
 def create_showing(db: Session, showing: ShowingCreate):
     db_showing = Showing(
@@ -26,3 +26,17 @@ def delete_showing(db: Session, showing_id: int):
 
 def get_showings_by_date(db: Session, date_id: int):
     return db.query(Showing).filter(Showing.id_date == date_id).all()
+
+def current_showings(db: Session):
+    today = datetime.today()
+    next_week = today + timedelta(days=6)
+
+    showings = (
+        db.query(Showing)
+        .join(Calendar, Showing.id_date == Calendar.id)
+        .join(Movie, Showing.id_movies == Movie.id)
+        .filter(Calendar.date >= today, Calendar.date <= next_week)
+        .order_by(Calendar.date, Showing.hour)
+        .all()
+    )
+    return showings

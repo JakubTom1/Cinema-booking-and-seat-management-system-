@@ -2,6 +2,9 @@
 from fastapi.middleware.cors import CORSMiddleware
 from database import engine
 from sqlalchemy import text
+from typing import List
+import models, schemas
+from database import get_db
 
 # Tworzenie aplikacji FastAPI
 app = FastAPI()
@@ -22,16 +25,11 @@ def json_maker(query:str):
         movies = [dict(row._mapping) for row in result]
     return movies
 
-@app.get("/movies")
-def get_movies():
-    query =(
-    """
-    select *
-    from movies
-    """
-    )
+@app.get("/movies", response_model=List[schemas.MovieRead])
+def get_movies(db: Session = Depends(get_db)):
+    movies = db.query(models.Movie).all()
     # query all movies
-    return json_maker(query)
+    return movies
 
 @app.get("/week")
 def get_week():
@@ -169,7 +167,8 @@ def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user
     '''
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
+from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 from backend.database import init_db
 from backend.routes import auth, movies, showings, reservations, admin, reports, programme

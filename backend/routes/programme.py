@@ -3,24 +3,14 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 from backend.database import get_db
 from backend.models import Showing, Calendar, Movie
+from backend.crud.showings import current_showings
 router = APIRouter()
 print("programme router loaded")
 
 @router.get("/programme")
 def get_week_programme(db: Session = Depends(get_db)):
     try:
-        today = datetime.today()
-        next_week = today + timedelta(days=7)
-
-        showings = (
-            db.query(Showing)
-            .join(Calendar, Showing.id_date == Calendar.id)
-            .join(Movie, Showing.id_movies == Movie.id)
-            .filter(Calendar.date >= today, Calendar.date <= next_week)
-            .order_by(Calendar.date, Showing.hour)
-            .all()
-        )
-
+        showings = current_showings(db)
         result = []
         for showing in showings:
             result.append({

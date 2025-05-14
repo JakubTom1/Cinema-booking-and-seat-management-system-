@@ -15,4 +15,5 @@ def admin_add_showing(showing: ShowingCreate, db: Session = Depends(get_db),
 @router.delete("/admin/showings/{showing_id}")
 def admin_remove_showing(showing_id: int, db: Session = Depends(get_db), 
                         _: dict = Depends(admin_required)):
-    return delete_showing(db, showing_id)'''
+    return delete_showing(db, showing_id)
+'''

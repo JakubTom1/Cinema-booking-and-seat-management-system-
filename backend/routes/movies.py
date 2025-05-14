@@ -4,7 +4,7 @@ from sqlalchemy import text
 
 router = APIRouter()
 
-@router.get("/movies")
+@router.get("/movies/{id_movies}")
 def get_movies():
     with engine.connect() as conn:
         result = conn.execute(text("SELECT * FROM movies"))
