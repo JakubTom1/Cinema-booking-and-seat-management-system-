@@ -171,7 +171,7 @@ from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 from backend.database import init_db
-from backend.routes import auth, movies, showings, reservations, admin, reports, programme
+from backend.routes import auth, movies, showings, reservations, admin, reports, programme, delete_ticket
 
 app = FastAPI()
 
@@ -192,7 +192,7 @@ app.include_router(reservations.router, prefix="/reservations", tags=["Reservati
 #app.include_router(admin.router, prefix="/admin", tags=["Admin"])
 #app.include_router(reports.router, prefix="/reports", tags=["Reports"])
 app.include_router(programme.router, prefix = "", tags=["Programme"])
-
+app.include_router(delete_ticket.router, prefix = "", tags = ["Delete Ticket"])
 @app.get("/")
 def root():
     return {"message": "Cinema booking API is running."}
