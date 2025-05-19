@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,18 +28,47 @@
             });
 
             function updateSelectionInfo() {
-                const selectedSeats = document.querySelectorAll(".seat.selected");
-                const seatIds = Array.from(selectedSeats).map(seat => seat.id);
-                document.querySelector("#selected-seats").textContent = seatIds.length > 0 
-                ? `Wybrane miejsca: ${seatIds.join(", ")}`
-                : "Brak wybranych miejsc.";
+              const selectedSeats = document.querySelectorAll(".seat.selected");
+              const seatIds = Array.from(selectedSeats).map(seat => seat.id);
+
+              sessionStorage.setItem("selectedSeats", JSON.stringify(seatIds));
+
+              document.querySelector("#selected-seats").textContent = seatIds.length > 0 
+                  ? `Wybrane miejsca: ${seatIds.join(", ")}`
+                  : "Brak wybranych miejsc.";
             }
+
+            const savedSeats = JSON.parse(sessionStorage.getItem("selectedSeats"));
+            if (savedSeats && Array.isArray(savedSeats)) {
+              savedSeats.forEach(seatId => {
+                const seat = document.getElementById(seatId);
+                if (seat && !seat.classList.contains("occupied")) {
+                  seat.classList.add("selected");
+                }
+              });
+              updateSelectionInfo();
+            }
+
+            const dalejBtn = document.getElementById("dalejBtn");
+            dalejBtn.addEventListener("click", (e) => {
+              const selectedSeats = JSON.parse(sessionStorage.getItem("selectedSeats")) || [];
+
+              if (selectedSeats.length === 0) {
+                e.preventDefault();
+                alert("Wybierz przynajmniej jedno miejsce, aby przejść dalej.");
+              } else {
+                window.location.href = "order.html";
+              }
+            });
     });
       </script>
 </head>
 <body>
     <header>
-      <h1>Super Kino</h1>
+      <div class="navbar">
+        <h1>Super Kino</h1>
+        <button class="login" onclick="window.location.href='login.html'">Login</button>
+      </div>
       <p class="date">Rezerwacja miejsc na seans</p>
     </header>
   
@@ -98,7 +127,7 @@
       
       <div class="navigation-buttons">
         <button class="nav-button" onclick="window.location.href='home.html'">Wróć</button>
-        <button class="nav-button" id="dalejBtn" onclick="alert('Przechodzimy dalej...')">Dalej</button>
+        <button class="nav-button" id="dalejBtn">Dalej</button>
       </div>
     </main>
   </body>
