@@ -1,3 +1,62 @@
+'''from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from database import engine
+from sqlalchemy import text
+from typing import List
+import models, schemas
+from database import get_db
+
+# Tworzenie aplikacji FastAPI
+app = FastAPI()
+
+# Dodaj CORS middleware
+# Fast Api działa na 8000, a tutaj dostaje dostęp do portu na którym działą strona
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:63342"],  # Zezwól na dostęp z tego portu
+    allow_credentials=True,
+    allow_methods=["*"],  # Zezwól na wszystkie metody (GET, POST itd.)
+    allow_headers=["*"],  # Zezwól na wszystkie nagłówki
+)
+
+def json_maker(query:str):
+    with engine.connect() as conn:
+        result = conn.execute(text(query))
+        movies = [dict(row._mapping) for row in result]
+    return movies
+
+@app.get("/movies", response_model=List[schemas.MovieRead])
+def get_movies(db: Session = Depends(get_db)):
+    movies = db.query(models.Movie).all()
+    # query all movies
+    return movies
+
+@app.get("/week")
+def get_week():
+    query =(
+        """
+        select weekday(c.date)
+        from calendar as c
+        where c.date >= curdate()
+        order by c.date asc
+        limit 7
+        """
+    )
+    # query the newest week days
+    return json_maker(query)
+
+@app.get("/pricelist")
+def get_prices():
+    query =(
+        """
+        select p.type, p.ticket_price
+        from pricelist as p
+        """
+    )
+    return json_maker(query)
+
+
+
 """
 Główny moduł aplikacji FastAPI, definiujący endpointy API.
 """
@@ -106,3 +165,35 @@ def read_users_me(current_user: User = Depends(get_current_user)):
     Pobiera informacje o aktualnie zalogowanym użytkowniku.
     """
     return current_user
+    '''
+
+from fastapi import FastAPI, Depends
+from sqlalchemy.orm import Session
+from fastapi.middleware.cors import CORSMiddleware
+from backend.database import init_db
+from backend.routes import auth, movies, showings, reservations, admin, reports, programme, delete_ticket
+
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+init_db()
+
+app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
+app.include_router(movies.router, prefix="/movies", tags=["Movies"])
+app.include_router(showings.router, prefix="/showings", tags=["Showings"])
+app.include_router(reservations.router, prefix="/reservations", tags=["Reservations"])
+#app.include_router(admin.router, prefix="/admin", tags=["Admin"])
+#app.include_router(reports.router, prefix="/reports", tags=["Reports"])
+app.include_router(programme.router, prefix = "", tags=["Programme"])
+app.include_router(delete_ticket.router, prefix = "", tags = ["Delete Ticket"])
+@app.get("/")
+def root():
+    return {"message": "Cinema booking API is running."}
+

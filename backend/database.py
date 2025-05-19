@@ -2,9 +2,10 @@
 Moduł odpowiedzialny za konfigurację bazy danych i zarządzanie sesjami.
 """
 
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import create_engine, MetaData, text
 from sqlalchemy.orm import declarative_base, sessionmaker
 from typing import Generator
+
 
 # Tworzenie połączenia z bazą danych MySQL
 url_address = "mysql+pymysql://szewcza1:rswiw3r376trLrTi@mysql.agh.edu.pl:3306/szewcza1"

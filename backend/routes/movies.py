@@ -1,18 +1,11 @@
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
-from backend.database import get_db
-from backend.models import Movie
-from backend.schemas import MovieCreate
+from fastapi import APIRouter
+from backend.database import engine
+from sqlalchemy import text
 
 router = APIRouter()
 
-@router.get("/")
-def get_movies(db: Session = Depends(get_db)):
-    return db.query(Movie).all()
-
-@router.post("/")
-def add_movie(movie: MovieCreate, db: Session = Depends(get_db)):
-    new_movie = Movie(title=movie.title, duration=movie.duration)
-    db.add(new_movie)
-    db.commit()
-    return {"message": "Film dodany!"}
+@router.get("/movies/{id_movies}")
+def get_movies():
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT * FROM movies"))
+        return [dict(row._mapping) for row in result]
