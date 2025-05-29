@@ -1,40 +1,131 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Movie List</title>
+    <title>Test Autoryzacji</title>
+    <style>
+        .container {
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        .form-group label {
+            display: block;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 5px;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
 </head>
 <body>
-    <h1>Movie List</h1>
-    <table border="1" id="movies-table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Title</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Wiersze zostaną dodane przez JavaScript -->
-        </tbody>
-    </table>
+    <div class="container">
+        <h2>Rejestracja</h2>
+        <div class="form-group">
+            <label>Imię:</label>
+            <input type="text" id="firstName">
+        </div>
+        <div class="form-group">
+            <label>Nazwisko:</label>
+            <input type="text" id="lastName">
+        </div>
+        <div class="form-group">
+            <label>Login:</label>
+            <input type="text" id="regLogin">
+        </div>
+        <div class="form-group">
+            <label>Hasło:</label>
+            <input type="password" id="regPassword">
+        </div>
+        <button onclick="register()">Zarejestruj</button>
+
+        <h2>Logowanie</h2>
+        <div class="form-group">
+            <label>Login:</label>
+            <input type="text" id="loginUsername">
+        </div>
+        <div class="form-group">
+            <label>Hasło:</label>
+            <input type="password" id="loginPassword">
+        </div>
+        <button onclick="login()">Zaloguj</button>
+
+        <div id="result" class="result"></div>
+    </div>
 
     <script>
-        fetch("http://127.0.0.1:8000/movies")
-            .then(response => response.json())
-            .then(data => {
-                const tableBody = document.getElementById("movies-table").getElementsByTagName("tbody")[0];
-                data.forEach(movie => {
-                    const row = document.createElement("tr");
-                    row.innerHTML = `
-                        <td>${movie.id}</td>
-                        <td>${movie.tittle}</td>
-                    `;
-                    tableBody.appendChild(row);
+        const API_URL = 'http://localhost:8000';
+
+        async function register() {
+            const userData = {
+                first_name: document.getElementById('firstName').value,
+                last_name: document.getElementById('lastName').value,
+                login: document.getElementById('regLogin').value,
+                password: document.getElementById('regPassword').value
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(userData)
                 });
-            })
-            .catch(error => {
-                console.error("Error loading movies:", error);
-            });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('result').innerHTML =
+                        `<div class="success">Rejestracja udana! Login: ${data.login}</div>`;
+                } else {
+                    document.getElementById('result').innerHTML =
+                        `<div class="error">Błąd: ${data.detail}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('result').innerHTML =
+                    `<div class="error">Błąd: ${error.message}</div>`;
+            }
+        }
+
+        async function login() {
+            const formData = new FormData();
+            formData.append('username', document.getElementById('loginUsername').value);
+            formData.append('password', document.getElementById('loginPassword').value);
+
+            try {
+                const response = await fetch(`${API_URL}/token`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('token', data.access_token);
+                    document.getElementById('result').innerHTML =
+                        `<div class="success">Zalogowano pomyślnie!<br>
+                        Status: ${data.user_status}<br>
+                        Token: ${data.access_token.substring(0, 20)}...</div>`;
+                } else {
+                    document.getElementById('result').innerHTML =
+                        `<div class="error">Błąd logowania: ${data.detail}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('result').innerHTML =
+                    `<div class="error">Błąd: ${error.message}</div>`;
+            }
+        }
     </script>
 </body>
 </html>

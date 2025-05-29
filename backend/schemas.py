@@ -9,9 +9,19 @@ from decimal import Decimal
 class UserCreate(BaseModel):
     first_name: str
     last_name: str
-    status: Optional[int] = 2
     login: str
     password: str
+
+class UserResponse(BaseModel):
+    id: int
+    first_name: str
+    last_name: str
+    login: str
+    status: int
+
+    class Config:
+        orm_mode = True
+
 
 
 # MOVIE
@@ -162,8 +172,11 @@ class TicketRead(BaseModel):
     class Config:
         orm_mode = True
 
-
-# Token
 class Token(BaseModel):
     access_token: str
     token_type: str
+    user_status: int
+
+class TokenData(BaseModel):
+    username: str | None = None
+    status: int | None = None

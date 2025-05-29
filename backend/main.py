@@ -177,7 +177,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:63342"],  # Zezwól na dostęp z tego portu
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -196,4 +196,6 @@ app.include_router(delete_ticket.router, prefix = "", tags = ["Delete Ticket"])
 @app.get("/")
 def root():
     return {"message": "Cinema booking API is running."}
+
+
 
