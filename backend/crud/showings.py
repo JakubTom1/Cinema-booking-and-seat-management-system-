@@ -40,3 +40,14 @@ def current_showings(db: Session):
         .all()
     )
     return showings
+
+def current_week(db:Session):
+    today = datetime.today()
+    next_week = today + timedelta(days=6)
+
+    curr_week = (
+        db.query(Calendar)
+        .filter(Calendar.date >= today, Calendar.date <= next_week)
+        .all()
+    )
+    return curr_week
