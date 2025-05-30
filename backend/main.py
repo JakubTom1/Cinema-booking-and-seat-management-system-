@@ -167,12 +167,12 @@ def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user
     '''
 
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, status
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 from backend.database import init_db
 from backend.routes import auth, movies, showings, reservations, admin, reports, programme, delete_ticket
-
+from backend.routes.auth import get_current_user
 app = FastAPI()
 
 app.add_middleware(
@@ -188,12 +188,14 @@ init_db()
 app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 app.include_router(movies.router, prefix="/movies", tags=["Movies"])
 app.include_router(showings.router, prefix="/showings", tags=["Showings"])
-app.include_router(reservations.router, prefix="/reservations", tags=["Reservations"])
+app.include_router(reservations.router, prefix="/reservations", tags=["Reservations"], dependencies=[Depends(get_current_user)])
 #app.include_router(admin.router, prefix="/admin", tags=["Admin"])
 #app.include_router(reports.router, prefix="/reports", tags=["Reports"])
 app.include_router(programme.router, prefix = "", tags=["Programme"])
-app.include_router(delete_ticket.router, prefix = "", tags = ["Delete Ticket"])
-@app.get("/")
+app.include_router(delete_ticket.router, prefix = "", tags = ["Delete Ticket"], dependencies=[Depends(get_current_user)])
+
+
+@app.get("/", status_code=status.HTTP_200_OK)
 def root():
     return {"message": "Cinema booking API is running."}
 

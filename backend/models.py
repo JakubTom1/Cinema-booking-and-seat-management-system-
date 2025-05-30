@@ -17,7 +17,7 @@ class User(Base):
     last_name = Column(String(15), index=True)
     status = Column(Integer, index=True, default=2) # client(2), cinema staff(1) or admin(0)
     login = Column(String(50), unique=True, index=True)
-    password = Column(String(50))
+    password = Column(String(128))
 
     transactions = relationship("Transaction", backref=backref("user"))
 
