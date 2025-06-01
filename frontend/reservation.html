@@ -11,6 +11,8 @@
             const params = new URLSearchParams(window.location.search);
             const film = params.get("film");
             const time = params.get("time");
+            const hall_id = params.get("hall_id");
+            const date_id = params.get("date_id");
             const date = params.get("date") || "Nieznana data";
             const headerDate = document.querySelector(".date");
 
