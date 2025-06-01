@@ -29,8 +29,16 @@ async function loadDays() {
 }
 
 async function loadFilms(date, date_id) {
-    const res = await fetch(`http://localhost:8000/showings/by-date/${date_id}`);
+    const res = await fetch(`http://localhost:8000/showings/showings/by-date/${date_id}`);
     const screenings = await res.json();
+    const movs = await fetch(`http://localhost:8000/movies/0`);
+    const movies_fetch = await movs.json();
+    const movies_dict = {};
+
+    movies_fetch.forEach(m => {
+        movies_dict[m.id].push(m.tittle);
+    });
+
     const filmsContainer = document.getElementById("films");
     filmsContainer.innerHTML = "";
     //date format
@@ -42,10 +50,10 @@ async function loadFilms(date, date_id) {
     
     const grouped = {};
     screenings.forEach(s => {
-        if (!grouped[s.id_movies]) {
-            grouped[s.id_movies] = [];
+        if (!grouped[movies_dict[s.id_movies]]) {
+            grouped[movies_dict[s.id_movies]] = [];
         }
-        grouped[s.id_movies].push([(s.hour).slice(0, 5), s.id_hall]);
+        grouped[movies_dict[s.id_movies]].push([(s.hour).slice(0, 5), s.id_hall, s.id]);
     });
 
     for (const title in grouped) {
@@ -58,8 +66,8 @@ async function loadFilms(date, date_id) {
                 <h2>${title}</h2>
                 <div class="showtimes">
 
-                    ${grouped[title].map(([time, hall_id]) => `
-                        <button onclick="goToReservation('${title}', '${time}', '${formattedDate}','${date_id}','${hall_id}')">${time}</button>
+                    ${grouped[title].map(([time, hall_id, showing_id]) => `
+                        <button onclick="goToReservation('${title}', '${time}', '${formattedDate}','${date_id}','${hall_id}, '${showing_id}')">${time}</button>
                     `).join('')}
                 </div>
             </div>
@@ -68,8 +76,8 @@ async function loadFilms(date, date_id) {
     }
 }
 
-function goToReservation(filmTitle, time, date, date_id, hall_id) {
-    const url = `reservation.html?film=${encodeURIComponent(filmTitle)}&time=${encodeURIComponent(time)}&date=${encodeURIComponent(date)}&date_id=${encodeURIComponent(date_id)}&hall_id=${encodeURIComponent(hall_id)}`;
+function goToReservation(filmTitle, time, date, date_id, hall_id, showing_id) {
+    const url = `reservation.html?film=${encodeURIComponent(filmTitle)}&time=${encodeURIComponent(time)}&date=${encodeURIComponent(date)}&date_id=${encodeURIComponent(date_id)}&hall_id=${encodeURIComponent(hall_id)}&showing_id=${encodeURIComponent(showing_id)}`;
     window.location.href = url;
 }
 
