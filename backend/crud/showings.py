@@ -1,3 +1,4 @@
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 from backend.models import Showing, Calendar, Movie
 from backend.schemas import ShowingCreate
@@ -28,8 +29,8 @@ def get_showings_by_date(db: Session, date_id: int):
     return db.query(Showing).filter(Showing.id_date == date_id).all()
 
 def current_showings(db: Session):
-    today = datetime.today()
-    next_week = today + timedelta(days=6)
+    today = datetime.today() - timedelta(days=1)
+    next_week = today + timedelta(days=7)
 
     showings = (
         db.query(Showing)
@@ -42,12 +43,14 @@ def current_showings(db: Session):
     return showings
 
 def current_week(db:Session):
-    today = datetime.today()
-    next_week = today + timedelta(days=6)
+    today = datetime.today() - timedelta(days=1)
+    next_week = today + timedelta(days=7)
 
-    curr_week = (
+    calendar = (
         db.query(Calendar)
         .filter(Calendar.date >= today, Calendar.date <= next_week)
         .all()
     )
-    return curr_week
+    return calendar
+
+
