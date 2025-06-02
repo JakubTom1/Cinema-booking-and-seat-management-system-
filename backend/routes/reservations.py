@@ -4,7 +4,7 @@ from backend.crud.tickets import create_tickets, get_tickets_by_transaction
 from backend.crud.transactions import create_transaction
 from backend.schemas import TicketCreate, TransactionCreate
 from backend.database import get_db
-from backend.models import Showing, Seat, Ticket
+from backend.models import Showing, Seat, Ticket, Pricelist
 from typing import List
 router = APIRouter()
 
@@ -54,4 +54,11 @@ def reserve_tickets(tickets: List[TicketCreate], db: Session = Depends(get_db)):
 @router.get("/tickets/{transaction_id}")
 def tickets_by_transaction(transaction_id: int, db: Session = Depends(get_db)):
     return get_tickets_by_transaction(db, transaction_id)
+
+@router.get("/prices")
+def get_ticket_prices(db: Session = Depends(get_db)):
+    pricelist = db.query(Pricelist).all()
+    if not pricelist:
+        raise HTTPException(status_code=404, detail="No price list found")
+    return pricelist
 
