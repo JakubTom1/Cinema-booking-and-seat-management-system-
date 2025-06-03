@@ -29,15 +29,34 @@ async function loadDays() {
 }
 
 async function loadFilms(date, date_id) {
-    const res = await fetch(`http://localhost:8000/showings/showings/by-date/${date_id}`);
-    const screenings = await res.json();
-    const movs = await fetch(`http://localhost:8000/movies/0`);
-    const movies_fetch = await movs.json();
+    let screenings;
+    try {
+        const res = await fetch(`http://localhost:8000/showings/showings/by-date/${date_id}`);
+        if (!res.ok) throw new Error("Błąd podczas pobierania seansów");
+        screenings = await res.json();
+    } catch (err) {
+        console.error("Nie udało się pobrać seansów:", err);
+        document.getElementById("films").innerHTML = "<p class='error'>Brak seansów dla wybranego dnia.</p>";
+        return;
+    }
 
     const movies_dict = {};
-    movies_fetch.forEach(m => {
-        movies_dict[m.id] = m.title || m.tittle || "Nieznany tytuł";
-    });
+
+    // Pobierz unikalne ID filmów
+    const movieIds = [...new Set(screenings.map(s => s.id_movies))];
+
+    // Pobierz tytuły filmów dla każdego ID
+    for (const movieId of movieIds) {
+        try {
+            const res = await fetch(`http://localhost:8000/movies/movies/${movieId}`);
+            if (!res.ok) throw new Error(`Film ${movieId} nie znaleziony`);
+            const movie = await res.json();
+            movies_dict[movieId] = movie.title || movie.tittle || "Nieznany tytuł";
+        } catch (err) {
+            console.warn("Błąd przy pobieraniu filmu:", movieId, err);
+            movies_dict[movieId] = "Nieznany tytuł";
+        }
+    }
 
     const filmsContainer = document.getElementById("films");
     filmsContainer.innerHTML = "";
@@ -56,8 +75,13 @@ async function loadFilms(date, date_id) {
         if (!grouped[movieTitle]) {
             grouped[movieTitle] = [];
         }
-        grouped[movieTitle].push([(s.hour).slice(0, 5), s.id_hall, s.id]);
+        grouped[movieTitle].push([(s.hour || '').slice(0, 5), s.id_hall, s.id]);
     });
+
+    if (Object.keys(grouped).length === 0) {
+        filmsContainer.innerHTML = "<p class='info'>Brak dostępnych seansów w wybranym dniu.</p>";
+        return;
+    }
 
     for (const title in grouped) {
         const section = document.createElement("section");
@@ -77,6 +101,8 @@ async function loadFilms(date, date_id) {
         filmsContainer.appendChild(section);
     }
 }
+
+
 
 function goToReservation(filmTitle, time, date, date_id, hall_id, showing_id) {
     const url = `reservation.html?film=${encodeURIComponent(filmTitle)}&time=${encodeURIComponent(time)}&date=${encodeURIComponent(date)}&date_id=${encodeURIComponent(date_id)}&hall_id=${encodeURIComponent(hall_id)}&showing_id=${encodeURIComponent(showing_id)}`;

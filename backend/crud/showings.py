@@ -28,6 +28,13 @@ def delete_showing(db: Session, showing_id: int):
 def get_showings_by_date(db: Session, date_id: int):
     return db.query(Showing).filter(Showing.id_date == date_id).all()
 
+def get_movie_by_id(db: Session, movie_id: int):
+    return db.query(Movie).filter(Movie.id == movie_id).first()
+
+def get_movie_by_id(db: Session, movie_id: int):
+    movie = db.query(Movie).filter(Movie.id == movie_id).first()
+    return movie
+
 def current_showings(db: Session):
     today = datetime.today() - timedelta(days=1)
     next_week = today + timedelta(days=7)
