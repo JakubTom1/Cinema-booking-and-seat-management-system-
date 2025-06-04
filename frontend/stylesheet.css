@@ -74,6 +74,18 @@ body {
     background: #d87c00;
   }
   
+  .logout {
+    background: #f90;
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    margin: 5px 5px 0 0;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background 0.3s;
+  }
+
   /* Rezerwacja miejsc */
   .seating-layout {
     max-width: 900px;
@@ -246,3 +258,15 @@ body {
     font-size: 1em;
     transition: background 0.3s;
   }
+
+.seat-row {
+    margin-bottom: 10px;
+}
+
+.seat-row span {
+    margin-right: 10px;
+}
+
+.seats-summary select {
+    padding: 5px;
+}

@@ -5,38 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order</title>
     <link rel="stylesheet" href="stylesheet.css">
+    <script src="order.js"></script>
     <script src="main.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const storedSeats = JSON.parse(sessionStorage.getItem("selectedSeats"));
-
-            const display = document.querySelector("#summary");
-            if (storedSeats && storedSeats.length > 0) {
-                display.textContent = storedSeats.join(", ");
-            } else {
-                display.textContent = "Nie wybrano żadnych miejsc.";
-            }
-        });
-</script>
 </head>
 <body>
     <header>
         <div class="navbar">
             <h1>Podsumowanie</h1>
-            <button class="login" onclick="window.location.href='login.html'">Login</button>
+            <span id="userDisplay"></span>
       </div>
     </header>
     <main>
         <div class="confirmation_window">
             <section id="ticket-summary">
                 <h2>Wybrane miejsca:</h2>
-                <div id="summary"></div>
-                <p><strong>Suma:</strong> 50zł</p>
+                <div id="summary" class="seats-summary"></div>
+                <p><strong>Suma:</strong> <span id="total">0</span> zł</p>
             </section>
             <div class="order_buttons_grp">
                 <div class="button-group">
-                    <button class="nav-button" onclick="window.location.href='reservation.html'">Dodaj kolejne miejsca</button>
-                    <button class="nav-button" onclick="window.location.href='payment.html'">Przejdź do płatności</button>
+                    <button id="return-button" class="nav-button">Dodaj kolejne miejsca</button>
+                    <button id="payment-button" class="nav-button">Przejdź do płatności</button>
                 </div>
             </div>
         </div>

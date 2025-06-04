@@ -105,8 +105,18 @@ async function loadFilms(date, date_id) {
 
 
 function goToReservation(filmTitle, time, date, date_id, hall_id, showing_id) {
-    const url = `reservation.html?film=${encodeURIComponent(filmTitle)}&time=${encodeURIComponent(time)}&date=${encodeURIComponent(date)}&date_id=${encodeURIComponent(date_id)}&hall_id=${encodeURIComponent(hall_id)}&showing_id=${encodeURIComponent(showing_id)}`;
-    window.location.href = url;
+  const login = sessionStorage.getItem("userLogin");
+  if (!login) {
+    // przekierowanie po loginie
+    const redirectUrl = encodeURIComponent(
+      `reservation.html?film=${filmTitle}&time=${time}&date=${date}&date_id=${date_id}&hall_id=${hall_id}&showing_id=${showing_id}`
+    );
+    window.location.href = `login.html?redirect=${redirectUrl}`;
+    return;
+  }
+
+  const url = `reservation.html?film=${encodeURIComponent(filmTitle)}&time=${encodeURIComponent(time)}&date=${encodeURIComponent(date)}&date_id=${encodeURIComponent(date_id)}&hall_id=${encodeURIComponent(hall_id)}&showing_id=${encodeURIComponent(showing_id)}`;
+  window.location.href = url;
 }
 
-window.onload = loadDays;
+window.addEventListener("load", loadDays);

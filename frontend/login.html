@@ -1,28 +1,29 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order</title>
-    <link rel="stylesheet" href="stylesheet.css">
-    <script src="main.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Logowanie</title>
+  <link rel="stylesheet" href="stylesheet.css" />
+  <script defer src="login.js"></script>
 </head>
 <body>
-    <header>
-        <h1>Logowanie do systemu</h1>
-    </header>
-    <main>
-        <div class="confirmation_window">
-        <form action="home.html" method="POST">
-            <label for="login">Login:</label><br>
-            <input type="text" id="login" name="login" required><br><br>
+  <header>
+    <h1>Logowanie do systemu</h1>
+  </header>
+  <main>
+    <div class="confirmation_window">
+      <form id="loginForm">
+        <label for="login">Login:</label><br />
+        <input type="text" id="login" name="login" required /><br /><br />
 
-            <label for="password">Hasło:</label><br>
-            <input type="password" id="password" name="password" required><br><br>
+        <label for="password">Hasło:</label><br />
+        <input type="password" id="password" name="password" required /><br /><br />
 
-            <button class="nav-button" type="submit">Zaloguj</button>
-        </form>
-        </div>
-    </main>
+        <button class="nav-button" type="submit">Zaloguj</button>
+        <p>Nie masz konta? <a href="register.html">Zarejestruj się</a></p>
+      </form>
+    </div>
+  </main>
 </body>
 </html>
