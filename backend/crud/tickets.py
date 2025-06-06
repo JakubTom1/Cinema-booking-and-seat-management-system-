@@ -90,8 +90,8 @@ def get_pricelist(db: Session, pricelist: List[PricelistRead]):
     )
     return query
 
-def ticket_info(db: Session):
-    query = db.execute(text("""
+def ticket_info(db: Session, number: int):
+    query = db.execute(text(f"""
     SELECT
         t.id,
         p.ticket_price,
@@ -109,8 +109,8 @@ def ticket_info(db: Session):
     INNER JOIN halls as h on h.id=s.id_halls
     INNER JOIN movies as m on m.id=sh.id_movies
     INNER JOIN calendar as c on c.id=sh.id_date
+    WHERE t.id = {number}
     """))
-    # query full information about the tickets
     return query.all()
 
 

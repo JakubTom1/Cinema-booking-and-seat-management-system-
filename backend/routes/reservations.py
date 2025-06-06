@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from backend.crud.tickets import create_tickets, get_tickets_by_transaction
+from backend.crud.tickets import create_tickets, get_tickets_by_transaction, ticket_info
 from backend.crud.transactions import create_transaction
 from backend.schemas import TicketCreate, TransactionCreate
 from backend.database import get_db
@@ -54,6 +54,11 @@ def reserve_tickets(tickets: List[TicketCreate], db: Session = Depends(get_db)):
 @router.get("/tickets/{transaction_id}")
 def tickets_by_transaction(transaction_id: int, db: Session = Depends(get_db)):
     return get_tickets_by_transaction(db, transaction_id)
+
+@router.get("/ticket/{ticket_id}")
+def get_ticket_info(ticket_id: int, db: Session = Depends(get_db)):
+    return ticket_info(db, ticket_id)
+
 
 @router.get("/prices")
 def get_ticket_prices(db: Session = Depends(get_db)):
