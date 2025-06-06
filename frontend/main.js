@@ -1,11 +1,22 @@
-async function pobierzFilmy() {
-    let response = await fetch("http://127.0.0.1:8000/seanse");
-    let filmy = await response.json();
-    let lista = document.getElementById("lista-filmow");
-    filmy.forEach(film => {
-        let li = document.createElement("li");
-        li.innerText = film.title;
-        lista.appendChild(li);
-    });
+function updateUserDisplay() {
+  const userDisplay = document.getElementById("userDisplay");
+  const login = sessionStorage.getItem("userLogin");
+
+  if (login) {
+    userDisplay.innerHTML = `
+      <span>Zalogowany jako: <strong>${login}</strong></span>
+      <button onclick="logout()" class="logout">Wyloguj</button>
+    `;
+  } else {
+    userDisplay.innerHTML = `
+      <button onclick="window.location.href='login.html'" class="login">Login</button>
+    `;
+  }
 }
-window.onload = pobierzFilmy;
+
+function logout() {
+  sessionStorage.clear();
+  window.location.href = "home.html";
+}
+
+window.addEventListener("load", updateUserDisplay);

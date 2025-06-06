@@ -5,29 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order</title>
     <link rel="stylesheet" href="stylesheet.css">
+    <script src="payment.js"></script>
     <script src="main.js"></script>
-    <script>
-        function zarejestrujPlatnosc() {
-            // Tu nastąpiłoby wywołanie do bazy danych
-            document.getElementById("potwierdzenie").style.display = "block";
-            document.getElementById("formularz").style.display = "none";
-            sessionStorage.removeItem("selectedSeats");
-            localStorage.removeItem("selectedSeats");
-        }
-    </script>
 </head>
 <body>
     <header>
         <div class="navbar">
             <h1>Wybierz metodę płatności</h1>
-            <button class="login" onclick="window.location.href='login.html'">Login</button>
+            <span id="userDisplay"></span>
       </div>
     </header>
     <main>
         <div class="confirmation_window">
             <section id="formularz">
                 <p>Kwota do zapłaty: <strong>50zł</strong></p>
-                <form onsubmit="event.preventDefault(); zarejestrujPlatnosc();">
+                <form>
                     <label><input type="radio" name="metoda" value="gotówka" required> Gotówka</label><br>
                     <label><input type="radio" name="metoda" value="karta"> Karta</label><br>
                     <label><input type="radio" name="metoda" value="blik"> Blik</label><br><br>
@@ -38,7 +30,7 @@
         <div class="confirmation_window">
             <section id="potwierdzenie" style="display:none;">
                 <h2>Płatność została pomyślnie zarejestrowana!</h2>
-                <p>Dziękujemy za zakup.</p>
+                <p>Zapraszamy na seans!</p>
                 <button class="nav-button" onclick="window.location.href='home.html'">Powrót</button>
             </section>
         </div>

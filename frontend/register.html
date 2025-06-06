@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rejestracja</title>
+  <link rel="stylesheet" href="stylesheet.css" />
+  <script defer src="register.js"></script>
+  <style>
+    main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+    }
+
+    .confirmation_window {
+    background-color: white;
+    padding: 2rem 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    }
+
+    .form-box input[type="text"],
+    .form-box input[type="password"] {
+    width: 100%;
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+    }
+
+    .form-box input:focus {
+    border-color: #2b4f81;
+    outline: none;
+    }
+
+    .form-box button[type="submit"] {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #f90;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background-color 0.2s;
+    }
+
+.form-box button[type="submit"]:hover {
+  background-color: rgb(205, 125, 5);
+}</style>
+</head>
+<body>
+  <header><h1>Rejestracja</h1></header>
+  <main>
+    <div class="confirmation_window">
+      <form id="registerForm" class="form-box">
+        <input type="text" placeholder="Imię" id="first_name" required /><br/>
+        <input type="text" placeholder="Nazwisko" id="last_name" required /><br/>
+        <input type="text" placeholder="Login" id="login" required /><br/>
+        <input type="password" placeholder="Hasło" id="password" required /><br/>
+        <button type="submit">Zarejestruj</button>
+      </form>
+    </div>
+  </main>
+</body>
+</html>
