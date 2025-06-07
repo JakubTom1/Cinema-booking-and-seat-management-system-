@@ -75,15 +75,20 @@ async function loadFilms(date, date_id) {
         if (!grouped[movieTitle]) {
             grouped[movieTitle] = [];
         }
-        grouped[movieTitle].push([(s.hour || '').slice(0, 5), s.id_hall, s.id, s.id_movies]);
+        const screeningHour = (s.hour || '').slice(0, 5);
+
+        if (formattedDate !== new Date().toISOString().slice(0, 10) || !hasTimePassed(screeningHour)) {
+            grouped[movieTitle].push([screeningHour, s.id_hall, s.id, s.id_movies]);
+}
     });
 
     if (Object.keys(grouped).length === 0) {
         filmsContainer.innerHTML = "<p class='info'>Brak dostępnych seansów w wybranym dniu.</p>";
         return;
     }
-
+    console.log(grouped)
     for (const title in grouped) {
+        if (grouped[title].length === 0) continue;
         const section = document.createElement("section");
         section.className = "film";
         section.innerHTML = `
@@ -116,6 +121,12 @@ function goToReservation(filmTitle, time, date, date_id, hall_id, showing_id) {
 
   const url = `reservation.html?film=${encodeURIComponent(filmTitle)}&time=${encodeURIComponent(time)}&date=${encodeURIComponent(date)}&date_id=${encodeURIComponent(date_id)}&hall_id=${encodeURIComponent(hall_id)}&showing_id=${encodeURIComponent(showing_id)}`;
   window.location.href = url;
+}
+
+function hasTimePassed(screeningHour) {
+    const [hour, minute] = screeningHour.split(":").map(Number);
+    const now = new Date();
+    return now.getHours() > hour || (now.getHours() === hour && now.getMinutes() >= minute);
 }
 
 window.addEventListener("load", loadDays);
