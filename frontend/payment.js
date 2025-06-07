@@ -54,7 +54,7 @@ window.addEventListener("load", () => {
         document.getElementById("formularz").style.display = "none";
         for (let i = sessionStorage.length - 1; i >= 0; i--) {
             const key = sessionStorage.key(i);
-            if (key !== "access_token" && key !== "userLogin") {
+            if (key !== "access_token" && key !== "userLogin" && key !== "userStatus") {
                 sessionStorage.removeItem(key);
             }
         }

@@ -75,7 +75,7 @@ async function loadFilms(date, date_id) {
         if (!grouped[movieTitle]) {
             grouped[movieTitle] = [];
         }
-        grouped[movieTitle].push([(s.hour || '').slice(0, 5), s.id_hall, s.id]);
+        grouped[movieTitle].push([(s.hour || '').slice(0, 5), s.id_hall, s.id, s.id_movies]);
     });
 
     if (Object.keys(grouped).length === 0) {
@@ -86,13 +86,12 @@ async function loadFilms(date, date_id) {
     for (const title in grouped) {
         const section = document.createElement("section");
         section.className = "film";
-
         section.innerHTML = `
-            <img src="https://via.placeholder.com/150x220.png?text=${encodeURIComponent(title)}" alt="${title}" />
+            <img src="./imgs/${grouped[title][0][3]}.png" alt="${title}" />
             <div class="info">
                 <h2>${title}</h2>
                 <div class="showtimes">
-                    ${grouped[title].map(([time, hall_id, showing_id]) => `
+                    ${grouped[title].map(([time, hall_id, showing_id, movie_id]) => `
                         <button onclick="goToReservation('${title}', '${time}', '${formattedDate}', '${date_id}', '${hall_id}', '${showing_id}')">${time}</button>
                     `).join('')}
                 </div>
