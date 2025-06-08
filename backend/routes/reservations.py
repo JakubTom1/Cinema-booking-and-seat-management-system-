@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from backend.crud.tickets import create_tickets, get_tickets_by_transaction, ticket_info
-from backend.crud.transactions import create_transaction
+from backend.crud.transactions import create_transaction, realise_transaction
 from backend.schemas import TicketCreate, TransactionCreate
 from backend.database import get_db
 from backend.models import Showing, Seat, Ticket, Pricelist
@@ -40,9 +40,11 @@ def get_seats_for_showing(showing_id: int, db: Session = Depends(get_db)):
 
     return results
 
-@router.post("/transactions")
+@router.post("/transactions", response_model=dict)
 def make_transaction(transaction: TransactionCreate, db: Session = Depends(get_db)):
-    return create_transaction(db, transaction)
+    db_transaction = create_transaction(db, transaction)
+    return {"transaction_id": db_transaction.id, "status": db_transaction.status}
+
 
 @router.post("/tickets/bulk")
 def reserve_tickets(tickets: List[TicketCreate], db: Session = Depends(get_db)):
@@ -67,3 +69,6 @@ def get_ticket_prices(db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="No price list found")
     return pricelist
 
+@router.put("/transactions/{transaction_id}")
+def realise_transaction_endpoint(transaction_id: int, db: Session = Depends(get_db)):
+    return realise_transaction(db, transaction_id)

@@ -14,6 +14,13 @@ def create_transaction(db: Session, transaction: TransactionCreate):
     db.refresh(db_transaction)
     return db_transaction
 
+def realise_transaction(db: Session, transaction_id: int):
+    db_transaction = db.query(Transaction).filter(Transaction.id == transaction_id).first()
+    if db_transaction:
+        db_transaction.status = "realized"
+        db.commit()
+        return db_transaction
+    return None
 
 def get_transactions_by_user(db: Session, user_id: int):
     return db.query(Transaction).filter(Transaction.id_users == user_id).all()
