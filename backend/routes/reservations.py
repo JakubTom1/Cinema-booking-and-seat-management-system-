@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from backend.crud.tickets import create_tickets, get_tickets_by_transaction, ticket_info
-from backend.crud.transactions import create_transaction, realise_transaction
+from backend.crud.transactions import create_transaction, realise_transaction, get_transactions_by_user
+from backend.routes.auth import get_current_user
 from backend.schemas import TicketCreate, TransactionCreate
 from backend.database import get_db
 from backend.models import Showing, Seat, Ticket, Pricelist
@@ -72,3 +73,10 @@ def get_ticket_prices(db: Session = Depends(get_db)):
 @router.put("/transactions/{transaction_id}")
 def realise_transaction_endpoint(transaction_id: int, db: Session = Depends(get_db)):
     return realise_transaction(db, transaction_id)
+
+@router.get("/user/transactions")
+def get_user_transactions(current_user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
+    transactions = get_transactions_by_user(db, current_user)
+    if not transactions:
+        raise HTTPException(status_code=404, detail="No transactions found for this user")
+    return transactions

@@ -74,3 +74,18 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     if not user:
         raise HTTPException(status_code=401, detail="Unauthorized")
     return user
+
+@router.get("/users/me")
+async def read_users_me(current_user: dict = Depends(get_current_user)):
+    """
+    Pobiera informacje o aktualnie zalogowanym użytkowniku.
+    """
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    if current_user.get("status") == 0:
+        current_user["status name"] = "admin"
+    elif current_user.get("status") == 1:
+        current_user["status name"] = "stuff"
+    else:
+        current_user["status name"] = "user"
+    return current_user
