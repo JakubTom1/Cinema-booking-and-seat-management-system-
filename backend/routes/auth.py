@@ -63,7 +63,8 @@ async def login_for_access_token(
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "user_status": user.status
+        "user_status": user.status,
+        "user_id": user.id
     }
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
