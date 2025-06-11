@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twoje bilety</title>
+    <link rel="stylesheet" href="stylesheet.css">
+    <script src="client.js" defer></script>
+    <script src="main.js" defer></script>
+    <style>
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 1px solid #ccc;
+      padding: 10px 0;
+    }
+  </style>
+</head>
+<body>
+    <header>
+        <div class="navbar">
+            <h1>Super Kino</h1>
+            <span id="userDisplay"></span>
+        </div>
+        <p class="date">Twoje transakcje</p>
+        <button id="backButton" class="panel-btn">Powrót do poprzedniej strony</button>
+        <button id="homeButton" class="panel-btn">Strona główna</button>
+    </header>
+
+    <main>
+        <div id="transactionsContainer"></div>
+        <div style="margin-top: 2rem;">
+            
+        </div>
+    </main>
+</body>
+</html>

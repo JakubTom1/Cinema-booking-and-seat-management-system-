@@ -299,3 +299,27 @@ body {
     padding: 5px;
 }
 
+.transaction {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+}
+
+#userDisplay {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.user-info {
+  font-size: 1rem;
+}
+
+.user-buttons {
+  display: flex;
+  gap: 10px;
+}

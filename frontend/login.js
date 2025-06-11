@@ -22,9 +22,11 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!response.ok) throw new Error("Błędny login lub hasło");
 
       const data = await response.json();
+      
       sessionStorage.setItem("access_token", data.access_token);
       sessionStorage.setItem("userLogin", username);
       sessionStorage.setItem("userStatus", data.user_status);
+      sessionStorage.setItem("userId", data.user_id);
 
       const params = new URLSearchParams(window.location.search);
       const redirect = params.get("redirect") || "home.html";

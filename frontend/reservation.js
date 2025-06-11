@@ -7,7 +7,7 @@ async function loadReservationPage() {
   const showing_id = params.get("showing_id");
   const date = params.get("date") || "Nieznana data";
   const headerDate = document.querySelector(".date");
-
+  sessionStorage.setItem("lastPage", window.location.href);
   sessionStorage.setItem("reservation_url", window.location.href);
   
   const token = sessionStorage.getItem("access_token");

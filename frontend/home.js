@@ -7,7 +7,7 @@ async function loadDays() {
     const days = await res.json();
     const dayButtons = document.getElementById("day-buttons");
     dayButtons.innerHTML = "";
-
+    sessionStorage.setItem("lastPage", window.location.href);
     const params = new URLSearchParams(window.location.search);
     chosenDate = params.get("date") || days[0].date;
     chosenDate_id = params.get("id") || days[0].id;
@@ -79,14 +79,9 @@ async function loadFilms(date, date_id) {
 
         if (formattedDate !== new Date().toISOString().slice(0, 10) || !hasTimePassed(screeningHour)) {
             grouped[movieTitle].push([screeningHour, s.id_hall, s.id, s.id_movies]);
-}
+        }
     });
 
-    if (Object.keys(grouped).length === 0) {
-        filmsContainer.innerHTML = "<p class='info'>Brak dostępnych seansów w wybranym dniu.</p>";
-        return;
-    }
-    console.log(grouped)
     for (const title in grouped) {
         if (grouped[title].length === 0) continue;
         const section = document.createElement("section");
@@ -102,7 +97,11 @@ async function loadFilms(date, date_id) {
                 </div>
             </div>
         `;
-        filmsContainer.appendChild(section);
+        filmsContainer.appendChild(section);   
+    }
+    if (filmsContainer.children.length === 0) {
+            filmsContainer.innerHTML = "<p class='info'>Brak dostępnych seansów w wybranym dniu.</p>";
+            return;
     }
 }
 

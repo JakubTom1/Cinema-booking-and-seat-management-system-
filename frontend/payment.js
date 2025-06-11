@@ -2,10 +2,21 @@ window.addEventListener("load", () => {
     const totalDisplay = document.querySelector("#formularz p strong");
     const total = JSON.parse(sessionStorage.getItem("total_payment")) || 0;
     totalDisplay.textContent = `${total} zł`;
-
+    sessionStorage.setItem("payment_url", window.location.href);
+    sessionStorage.setItem("lastPage", window.location.href);
     const params = new URLSearchParams(window.location.search);
-    const transaction_id = params.get("transaction_id");
-
+    const transaction_id = parseInt(params.get("transaction_id"));
+    const transaction_id_session = parseInt(sessionStorage.getItem("transactionId"));
+    if (transaction_id !== transaction_id_session) {
+        for (let i = sessionStorage.length - 1; i >= 0; i--) {
+            const key = sessionStorage.key(i);
+            if (key !== "access_token" && key !== "userLogin" && key !== "userStatus" && key !== "userId") {
+                sessionStorage.removeItem(key);
+            }
+        }
+        alert('Wystąpił błąd zgodności statusu płatności. Powrót na stronę główną');
+        window.location.href = "home.html";
+    }   
     const paymentForm = document.querySelector("form");
     paymentForm.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -15,19 +26,16 @@ window.addEventListener("load", () => {
             alert("Wybierz metodę płatności.");
             return;
         }
-        /*
         try {
             const token = sessionStorage.getItem("access_token");
-            const res = await fetch(`http://localhost:8000/transactions/confirm`, {
-                method: "POST",
+            const res = await fetch(`http://localhost:8000/reservations/transactions/${transaction_id}`, {
+                method: "PUT",
                 headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    transaction_id: transaction_id,
-                    payment_method: selectedMethod,
-                    amount_paid: total
+                    transaction_id: transaction_id
                 })
             });
 
@@ -36,27 +44,18 @@ window.addEventListener("load", () => {
                 throw new Error(`Błąd przy potwierdzaniu płatności: ${errMsg}`);
             }
 
-            // On success: show confirmation, hide form, clear reservation data
             document.getElementById("potwierdzenie").style.display = "block";
             document.getElementById("formularz").style.display = "none";
             for (let i = sessionStorage.length - 1; i >= 0; i--) {
             const key = sessionStorage.key(i);
-            if (key !== "access_token" && key !== "userLogin") {
+            if (key !== "access_token" && key !== "userLogin" && key !== "userStatus" && key !== "userId") {
                 sessionStorage.removeItem(key);
+                }
             }
-        }
         } catch (err) {
             alert(err.message);
             console.error(err);
         }
-            */
-        document.getElementById("potwierdzenie").style.display = "block";
-        document.getElementById("formularz").style.display = "none";
-        for (let i = sessionStorage.length - 1; i >= 0; i--) {
-            const key = sessionStorage.key(i);
-            if (key !== "access_token" && key !== "userLogin" && key !== "userStatus") {
-                sessionStorage.removeItem(key);
-            }
-        }
+
     });
 });

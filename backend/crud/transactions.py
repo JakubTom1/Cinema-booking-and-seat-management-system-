@@ -43,7 +43,6 @@ def get_transactions_by_user(db: Session, current_user: dict):
         calendar = showing.calendar
         hall = showing.hall
         tickets = transaction.tickets
-
         ticket_data = []
         for ticket in tickets:
             seat = ticket.seat
@@ -61,6 +60,7 @@ def get_transactions_by_user(db: Session, current_user: dict):
             "date": calendar.date.date(),  # data
             "time": showing.hour,  # godzina seansu
             "hall_number": hall.hall_num,
+            "transaction_date": transaction.date,
             "seats": [{"row": t["seat_row"], "number": t["seat_number"]} for t in ticket_data],
             "total_price": sum(t["price"] for t in ticket_data)
         })
