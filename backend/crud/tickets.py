@@ -61,27 +61,34 @@ def get_tickets_by_transaction(db: Session, transaction_id: int):
     return db.query(Ticket).filter(Ticket.id_transaction == transaction_id).all()
 
 
-def delete_tickets(db: Session, tickets: List[TicketRead]):
+def delete_tickets(db: Session, transaction_id: int):
+    """
+    Delete all tickets associated with a transaction and mark the transaction as cancelled.
+    """
     try:
-        if tickets and len(tickets) > 0:
-            transaction_id = tickets[0].id_transaction
+        # Get all tickets for the transaction
+        tickets = db.query(Ticket).filter(Ticket.id_transaction == transaction_id).all()
 
-            for ticket in tickets:
-                db.delete(ticket)
+        if not tickets:
+            raise HTTPException(status_code=404, detail="No tickets found for this transaction")
 
-            transaction = db.query(Transaction).filter(Transaction.id == transaction_id).first()
-            if transaction:
-                transaction.status = 'cancelled'
-            else:
-                raise HTTPException(status_code=404, detail="Transaction not found")
+        # Delete all tickets
+        for ticket in tickets:
+            db.delete(ticket)
+
+        # Update transaction status
+        transaction = db.query(Transaction).filter(Transaction.id == transaction_id).first()
+        if transaction:
+            transaction.status = 'cancelled'
+        else:
+            raise HTTPException(status_code=404, detail="Transaction not found")
 
         db.commit()
-        return {"message": "Tickets deleted and transaction cancelled successfully"}
+        return {"message": f"Successfully deleted {len(tickets)} tickets and cancelled transaction {transaction_id}"}
 
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error deleting tickets: {str(e)}")
-    # Delete tickets from database and set transaction to "cancelled"
 
 def get_pricelist(db: Session, pricelist: List[PricelistRead]):
     query = (

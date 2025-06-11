@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from backend.crud.tickets import create_tickets, get_tickets_by_transaction, ticket_info
+from backend.crud.tickets import create_tickets, get_tickets_by_transaction, ticket_info, delete_tickets
 from backend.crud.transactions import create_transaction, realise_transaction, get_transactions_by_user
 from backend.routes.auth import get_current_user
 from backend.schemas import TicketCreate, TransactionCreate
@@ -62,6 +62,12 @@ def tickets_by_transaction(transaction_id: int, db: Session = Depends(get_db)):
 def get_ticket_info(ticket_id: int, db: Session = Depends(get_db)):
     return ticket_info(db, ticket_id)
 
+@router.delete("/transactions/{transaction_id}/cancel")
+def cancel_transaction(transaction_id: int, db: Session = Depends(get_db)):
+    """
+    Cancel a transaction by deleting all associated tickets and marking the transaction as cancelled.
+    """
+    return delete_tickets(db, transaction_id)
 
 @router.get("/prices")
 def get_ticket_prices(db: Session = Depends(get_db)):
