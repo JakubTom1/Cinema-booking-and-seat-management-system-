@@ -41,38 +41,21 @@ window.addEventListener("DOMContentLoaded", async () => {
         refundBtn.classList.add("panel-btn");
 
         refundBtn.addEventListener("click", async () => {
-        try {
-            const ticketRes = await fetch(`http://localhost:8000/reservations/tickets/${transaction.transaction_id}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
+            try {
+                const res = await fetch(`http://localhost:8000/reservations/transactions/${transaction.transaction_id}/cancel`, {
+                    method: "DELETE",
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!res.ok) throw new Error("Nie udało się anulować biletów.");
+                alert("Bilety zostały zwrócone.");
+                window.location.reload();
+
+            } catch (error) {
+                alert("Błąd podczas zwrotu: " + error.message);
             }
-            });
-
-            const tickets = await ticketRes.json();
-
-            const payload = tickets.map(ticket => ({
-            id: ticket.id,
-            id_transaction: ticket.id_transaction,
-            id_pricelist: ticket.id_pricelist,
-            id_seats: ticket.id_seat
-            }));
-
-            const deleteRes = await fetch("http://localhost:8000/tickets/", {
-            method: "DELETE",
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-            });
-
-            if (!deleteRes.ok) throw new Error("Błąd podczas usuwania biletów.");
-
-            alert("Bilety zostały usunięte.");
-            window.location.reload();
-        } catch (err) {
-            alert("Błąd: " + err.message);
-        }
         });
 
         div.appendChild(refundBtn);

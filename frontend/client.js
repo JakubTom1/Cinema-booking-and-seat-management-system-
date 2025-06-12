@@ -59,34 +59,14 @@ window.addEventListener("load", async () => {
                     const transactionId = transaction.transaction_id;
 
                     try {
-                        const res = await fetch(`http://localhost:8000/reservations/tickets/${transactionId}`, {
+                        const res = await fetch(`http://localhost:8000/reservations/transactions/${transactionId}/cancel`, {
+                            method: "DELETE",
                             headers: {
                                 'Authorization': `Bearer ${token}`
                             }
                         });
 
-                        if (!res.ok) throw new Error("Nie udało się pobrać biletów.");
-
-                        const tickets = await res.json();
-
-                        const payload = tickets.map(ticket => ({
-                            id: ticket.id,
-                            id_transaction: ticket.id_transaction,
-                            id_pricelist: ticket.id_pricelist,
-                            id_seats: ticket.id_seat
-                        }));
-
-                        const deleteRes = await fetch("http://localhost:8000/tickets/", {
-                            method: "DELETE",
-                            headers: {
-                                'Authorization': `Bearer ${token}`,
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(payload)
-                        });
-
-                        if (!deleteRes.ok) throw new Error("Nie udało się anulować biletów.");
-
+                        if (!res.ok) throw new Error("Nie udało się anulować biletów.");
                         alert("Bilety zostały zwrócone.");
                         window.location.reload();
 
