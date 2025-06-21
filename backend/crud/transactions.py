@@ -1,19 +1,44 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from backend.models import Transaction, Ticket, User
 from backend.schemas import TransactionCreate
 from fastapi import HTTPException
+from datetime import datetime, timedelta
 
 def create_transaction(db: Session, transaction: TransactionCreate):
+    # Usuń przeterminowane transakcje przed utworzeniem nowej
+    cleanup_expired_transactions(db)
+    
     db_transaction = Transaction(
         id_users=transaction.id_users,
         id_showings=transaction.id_showings,
-        status=transaction.status,
-        date=transaction.date
+        status="in_progress",
+        date=transaction.date,
+        created_at=datetime.now()
     )
     db.add(db_transaction)
     db.commit()
     db.refresh(db_transaction)
     return db_transaction
+
+def cleanup_expired_transactions(db: Session):
+    """Usuwa transakcje starsze niż 15 minut ze statusem 'in_progress'"""
+    expiry_time = datetime.now() - timedelta(minutes=15)
+    
+    # Usuń bilety powiązane z przeterminowanymi transakcjami
+    db.execute(text("""
+        DELETE t FROM tickets t
+        INNER JOIN transactions tr ON t.id_transaction = tr.id
+        WHERE tr.status = 'in_progress' AND tr.created_at < :expiry_time
+    """), {"expiry_time": expiry_time})
+    
+    # Usuń przeterminowane transakcje
+    db.execute(text("""
+        DELETE FROM transactions 
+        WHERE status = 'in_progress' AND created_at < :expiry_time
+    """), {"expiry_time": expiry_time})
+    
+    db.commit()
 
 def realise_transaction(db: Session, transaction_id: int):
     db_transaction = db.query(Transaction).filter(Transaction.id == transaction_id).first()

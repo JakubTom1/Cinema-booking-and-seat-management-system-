@@ -7,6 +7,7 @@ from backend.schemas import TicketCreate, TransactionCreate
 from backend.database import get_db
 from backend.models import Showing, Seat, Ticket, Pricelist
 from typing import List
+from datetime import timedelta
 router = APIRouter()
 
 @router.get("/reservations/{showing_id}")
@@ -44,7 +45,11 @@ def get_seats_for_showing(showing_id: int, db: Session = Depends(get_db)):
 @router.post("/transactions", response_model=dict)
 def make_transaction(transaction: TransactionCreate, db: Session = Depends(get_db)):
     db_transaction = create_transaction(db, transaction)
-    return {"transaction_id": db_transaction.id, "status": db_transaction.status}
+    return {
+        "transaction_id": db_transaction.id, 
+        "status": db_transaction.status,
+        "expires_at": (db_transaction.created_at + timedelta(minutes=15)).isoformat()
+    }
 
 
 @router.post("/tickets/bulk")

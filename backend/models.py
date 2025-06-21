@@ -89,6 +89,7 @@ class Transaction(Base):
     id_showings = Column(Integer, ForeignKey('showings.id'))
     status = Column(String(15), index=True)
     date = Column(Date)
+    created_at = Column(DateTime, index=True)
 
     tickets = relationship("Ticket", backref=backref("transaction"))
 
