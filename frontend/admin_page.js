@@ -18,6 +18,10 @@ window.addEventListener("DOMContentLoaded", async () => {
     for (let id = 1; id <= maxMovieId; id++) {
         try {
         const res = await fetch(`http://localhost:8000/movies/movies/${id}`);
+        if (res.status === 401) {
+            alert("Unauthorized. Please log in again.");
+            window.location.href = "login.html";
+        }
         if (!res.ok) continue;
 
         const movie = await res.json();
@@ -76,7 +80,10 @@ window.addEventListener("DOMContentLoaded", async () => {
         },
         body: JSON.stringify(payload)
       });
-
+      if (res.status === 401) {
+            alert("Unauthorized. Please log in again.");
+            window.location.href = "login.html";
+        }
       if (!response.ok) {
             throw new Error("Nie udało się dodać seansu.");
       }
@@ -98,7 +105,10 @@ window.addEventListener("DOMContentLoaded", async () => {
                 method: "DELETE",
                 headers: { Authorization: `Bearer ${token}` }
         });
-
+        if (res.status === 401) {
+            alert("Unauthorized. Please log in again.");
+            window.location.href = "login.html";
+        }
         if (!res.ok) throw new Error("Nie udało się usunąć seansu.");
 
         alert("Seans usunięty pomyślnie.");

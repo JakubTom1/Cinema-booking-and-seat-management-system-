@@ -114,7 +114,10 @@ async function loadOrderPage() {
                     'Authorization': `Bearer ${token}`
                 }
             });
-
+            if (response_existing.status === 401) {
+                alert("Unauthorized. Please log in again.");
+                window.location.href = "login.html";
+            }
             if (!response_existing.ok) throw new Error("Błąd przy sprawdzaniu istniejących biletów.");
 
             const existingTicketsRaw = await response_existing.json();
@@ -186,7 +189,7 @@ async function loadOrderPage() {
             const selectedSeats = JSON.parse(sessionStorage.getItem(`selectedSeats_${showing_id}`)) || [];
             const conflictSeats = selectedSeats.filter(seat => takenSeatIds.includes(seat));
             if (conflictSeats.length > 0) {
-                alert(`Niektóre z wybranych miejsc zostały już zarezerwowane: ${conflictSeats.join(", ")}.\nProszę wrócić i wybrać inne miejsca.`);
+                alert(`Niektóre z wybranych miejsc zostały już zarezerwowane. Proszę wrócić i wybrać inne miejsca.`);
                 window.location.href = sessionStorage.getItem("reservation_url");
                 return;
             } 
@@ -216,7 +219,10 @@ async function loadOrderPage() {
             },
             body: JSON.stringify(transactionData),
             });
-
+            if (response_transaction_send.status === 401) {
+                alert("Unauthorized. Please log in again.");
+                window.location.href = "login.html";
+            }
             if (response_transaction_send.status === 401) {
                 alert("Unauthorized. Please log in again.");
                 window.location.href = "login.html";
@@ -241,6 +247,7 @@ async function loadOrderPage() {
                 };
             });
             
+            try {
             const response_ticket_creation = await fetch("http://localhost:8000/reservations/tickets/bulk", {
             method: "POST",
             headers: {
@@ -258,7 +265,9 @@ async function loadOrderPage() {
             if (!response_ticket_creation.ok) throw new Error("Błąd podczas tworzenia biletów.");
             sessionStorage.setItem("ticketsData", JSON.stringify(ticketsData));
             window.location.href = paymentUrl;
-
+            } catch (error) {console.error("Błąd podczas tworzenia transakcji:", error);
+                alert("Wystąpił problem z dodaniem biletu. Spróbuj ponownie później.");
+            }
         }   catch (error) {
                 console.error("Błąd podczas tworzenia transakcji:", error);
                 alert("Wystąpił problem z utworzeniem twojej transakcji lub dodaniem biletu. Spróbuj ponownie później.");

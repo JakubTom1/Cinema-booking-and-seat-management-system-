@@ -12,7 +12,7 @@ def create_transaction(db: Session, transaction: TransactionCreate):
     db_transaction = Transaction(
         id_users=transaction.id_users,
         id_showings=transaction.id_showings,
-        status="in_progress",
+        status="pending",
         date=transaction.date,
         created_at=datetime.now()
     )
@@ -22,20 +22,20 @@ def create_transaction(db: Session, transaction: TransactionCreate):
     return db_transaction
 
 def cleanup_expired_transactions(db: Session):
-    """Usuwa transakcje starsze niż 15 minut ze statusem 'in_progress'"""
+    """Usuwa transakcje starsze niż 15 minut ze statusem 'pending'"""
     expiry_time = datetime.now() - timedelta(minutes=15)
     
     # Usuń bilety powiązane z przeterminowanymi transakcjami
     db.execute(text("""
         DELETE t FROM tickets t
         INNER JOIN transactions tr ON t.id_transaction = tr.id
-        WHERE tr.status = 'in_progress' AND tr.created_at < :expiry_time
+        WHERE tr.status = 'pending' AND tr.created_at < :expiry_time
     """), {"expiry_time": expiry_time})
     
     # Usuń przeterminowane transakcje
     db.execute(text("""
         DELETE FROM transactions 
-        WHERE status = 'in_progress' AND created_at < :expiry_time
+        WHERE status = 'pending' AND created_at < :expiry_time
     """), {"expiry_time": expiry_time})
     
     db.commit()

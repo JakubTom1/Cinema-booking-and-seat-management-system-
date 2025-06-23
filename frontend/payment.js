@@ -38,10 +38,15 @@ window.addEventListener("load", () => {
                     transaction_id: transaction_id
                 })
             });
-
+            if (res.status === 401) {
+                alert("Unauthorized. Please log in again.");
+                window.location.href = "login.html";
+            }
             if (!res.ok) {
                 const errMsg = await res.text();
-                throw new Error(`Błąd przy potwierdzaniu płatności: ${errMsg}`);
+                alert(`Błąd przy potwierdzaniu płatności: ${errMsg}`);
+                logout();
+                window.location.href = "home.html";
             }
 
             document.getElementById("potwierdzenie").style.display = "block";
