@@ -26,7 +26,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     for (const transaction of transactions) {
         if (transaction.total_price != 0) {
             const div = document.createElement("div");
-            div.className = "transaction-box";
+            div.className = "transaction";
             div.innerHTML = `
                 <h3>${transaction.movie_title}</h3>
                 <p>Data transakcji: ${transaction.transaction_date}</p>

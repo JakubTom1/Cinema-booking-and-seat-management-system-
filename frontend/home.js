@@ -91,9 +91,15 @@ async function loadFilms(date, date_id) {
             <div class="info">
                 <h2>${title}</h2>
                 <div class="showtimes">
-                    ${grouped[title].map(([time, hall_id, showing_id, movie_id]) => `
-                        <button onclick="goToReservation('${title}', '${time}', '${formattedDate}', '${date_id}', '${hall_id}', '${showing_id}')">${time}</button>
-                    `).join('')}
+                    ${grouped[title]
+                        .sort((a, b) => {
+                            const [timeA] = a;
+                            const [timeB] = b;
+                            return timeA.localeCompare(timeB);
+                        })
+                        .map(([time, hall_id, showing_id, movie_id]) => `
+                            <button onclick="goToReservation('${title}', '${time}', '${formattedDate}', '${date_id}', '${hall_id}', '${showing_id}')">${time}</button>
+                        `).join('')}
                 </div>
             </div>
         `;
